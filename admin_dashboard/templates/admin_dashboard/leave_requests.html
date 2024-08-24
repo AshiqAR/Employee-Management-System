@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Leave Requests{% endblock %}
+
+{% block content %}
+  <h2>Leave Requests</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Employee</th>
+        <th>Leave Type</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Loop through leave requests -->
+      {% for request in leave_requests %}
+      <tr>
+        <td>{{ request.id }}</td>
+        <td>{{ request.employee.name }}</td>
+        <td>{{ request.leave_type }}</td>
+        <td>{{ request.status }}</td>
+        <td><a href="{% url 'admin_dashboard:review_leave' request.id %}">Review</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

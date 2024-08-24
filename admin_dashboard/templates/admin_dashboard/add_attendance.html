@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Add Attendance{% endblock %}
+
+{% block content %}
+  <h2>Add Attendance</h2>
+  <form action="{% url 'admin_dashboard:add_attendance' %}" method="POST">
+    {% csrf_token %}
+    <!-- Form fields for attendance details -->
+    <button type="submit">Submit Attendance</button>
+  </form>
+{% endblock %}
