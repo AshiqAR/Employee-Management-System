@@ -11,4 +11,6 @@ urlpatterns = [
     path('leave_requests/', views.leave_requests, name='leave_requests'),
     path('notifications/', views.notifications, name='notifications'),
     path('logout/', views.logout_view, name='logout'),
+
+    path('edit_employee/<int:employee_id>/', views.edit_employee, name='edit_employee'),
 ]

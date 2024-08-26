@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.auth.decorators import user_passes_test
+from employees.models import Designation, Employee
+from attendance.models import Attendance
 
 def group_required(group_name):
     def in_group(user):
@@ -13,11 +15,14 @@ def index(request):
 
 @group_required('hr')
 def add_employee(request):
-    return render(request, 'admin_dashboard/add_employee.html')
+    designations = Designation.objects.all()
+    return render(request, 'admin_dashboard/add_employee.html', {'designations': designations})
 
 @group_required('hr')
 def view_employees(request):
-    return render(request, 'admin_dashboard/view_employees.html')
+    employees = Employee.objects.all()
+    designations = Designation.objects.all()
+    return render(request, 'admin_dashboard/view_employees.html', {'employees': employees, 'designations': designations})
 
 @group_required('hr')
 def add_attendance(request):
@@ -34,3 +39,9 @@ def notifications(request):
 @group_required('hr')
 def logout_view(request):
     return HttpResponse("Hello, world. You're at the logout page.")
+
+@group_required('hr')
+def edit_employee(request, employee_id):
+    employee = Employee.objects.get(employee_id=employee_id)
+    designations = Designation.objects.all()
+    return render(request, 'admin_dashboard/edit_employee.html', {'employee': employee, 'designations': designations})

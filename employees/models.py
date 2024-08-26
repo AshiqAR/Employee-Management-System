@@ -14,7 +14,7 @@ class Designation(models.Model):
         return self.designation_name
     
 class Employee(models.Model):
-    employee_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    employee_id = models.AutoField(primary_key=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
@@ -39,8 +39,8 @@ class Employee(models.Model):
         return self.first_name + ' ' + self.last_name
 
 class Document(models.Model):
-    document_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='documents')
+    document_id = models.AutoField(primary_key=True)
+    employee_id = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='documents')
     document_type = models.CharField(max_length=255)
     document_path = models.CharField(max_length=255)
     uploaded_at = models.DateTimeField(auto_now_add=True)

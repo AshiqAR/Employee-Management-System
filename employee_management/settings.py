@@ -53,8 +53,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    'employee_management.middlewares.AuthMiddleware',
 ]
 
 ROOT_URLCONF = 'employee_management.urls'

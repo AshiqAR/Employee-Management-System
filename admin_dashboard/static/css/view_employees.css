@@ -1,0 +1,109 @@
+.template-container {
+    width: 100%;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+}
+
+.search-container {
+  margin-bottom: 20px;
+}
+
+#searchInput {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.filter-container {
+  margin-bottom: 20px;
+}
+
+#designationFilter {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table,
+th,
+td {
+  border: 1px solid #ddd;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: left;
+}
+
+th {
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #e2e2e2;
+}
+
+.emp-name {
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.pagination {
+  display: inline-block;
+}
+
+.pagination a {
+  color: black;
+  float: left;
+  padding: 8px 16px;
+  text-decoration: none;
+}
+
+.pagination a.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.pagination a:hover:not(.active) {
+  background-color: #ddd;
+}
+
+.pagination .prev {
+  float: left;
+}
+
+.pagination .next {
+  float: right;
+}
+
+.pagination .disabled {
+  color: #ddd;
+}
+
+.pagination .disabled:hover {
+  background-color: #f1f1f1;
+}
+
+.pagination .active {
+  background-color: #007bff;
+  color: white;
+}
+
+.pagination .active:hover {
+  background-color: #007bff;
+}

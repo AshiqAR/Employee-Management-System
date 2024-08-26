@@ -1,12 +1,80 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Add New Employee{% endblock %}
 
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/add_employee.css' %}" />
+{% endblock %}
+
 {% block content %}
-  <h2>Add New Employee</h2>
-  <form action="{% url 'admin_dashboard:add_employee' %}" method="POST">
-    {% csrf_token %}
-    <!-- Form fields for employee details -->
-    <button type="submit">Add Employee</button>
-  </form>
+<div class="addemployee-container">
+    <h2>Add New Employee</h2>
+    <form action="{% url 'admin_dashboard:add_employee' %}" method="POST" class="employee-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" name="first_name" required />
+        </div>
+        
+        <div class="form-group">
+            <label for="last_name">Last Name</label>
+            <input type="text" id="last_name" name="last_name" required />
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required />
+        </div>
+        
+        <div class="form-group">
+            <label for="phone_number">Phone Number</label>
+            <input type="tel" id="phone_number" name="phone_number" required />
+        </div>
+        
+        <div class="form-group">
+            <label for="date_of_birth">Date of Birth</label>
+            <input type="date" id="date_of_birth" name="date_of_birth" required />
+        </div>
+        
+        <div class="form-group">
+            <label for="date_of_joining">Date of Joining</label>
+            <input type="date" id="date_of_joining" name="date_of_joining" required />
+        </div>
+        
+        <div class="form-group">
+            <label for="bank_name">Bank Name</label>
+            <input type="text" id="bank_name" name="bank_name" required />
+        </div>
+        
+        <div class="form-group">
+            <label for="bank_account_number">Bank Account Number</label>
+            <input type="text" id="bank_account_number" name="bank_account_number" required />
+        </div>
+        
+        <div class="form-group">
+            <label for="ifsc_code">IFSC Code</label>
+            <input type="text" id="ifsc_code" name="ifsc_code" required />
+        </div>
+        
+        <div class="form-group">
+            <label for="department_id">Department</label>
+            <select id="department_id" name="department_id" required>
+                <!-- Options for departments -->
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="designation_id">Designation</label>
+            <select id="designation_id" name="designation_id" required>
+                {% for designation in designations %}
+                    <option value="{{ designation.id }}">{{ designation.designation_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <button type="submit" class="submit-button">Add Employee</button>
+    </form>
+</div>
 {% endblock %}
