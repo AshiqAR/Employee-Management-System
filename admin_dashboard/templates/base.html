@@ -4,11 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Employee Management System{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
     <style>
+      :root {
+        --primary-color: #0b3d72;
+        --secondary-color: #003d7a;
+        --tertiary-color: #f5f5f5;
+        --nav-color: #003a77;
+      }
       * {
         box-sizing: border-box;
       }
-      body {
+      .global-body {
         font-family: Arial, sans-serif;
         background-color: #f5f5f5;
         margin: 0;
@@ -17,8 +27,8 @@
         flex-direction: column;
         align-items: center;
       }
-      header {
-        background-color: #007bff;
+      .header {
+        background-color: var(--nav-color);
         color: #fff;
         height: 8vh;
         width: 100%;
@@ -31,9 +41,13 @@
         justify-content: space-between;
         align-items: center;
       }
-      header h2 {
+      .header h2 {
         margin: 2px 10px;
         font-size: 1.5em;
+      }
+      .header a#home-a {
+        color: white;
+        text-decoration: none;
       }
       .nav-right {
         display: flex;
@@ -46,7 +60,7 @@
         font-size: 16px;
       }
       .nav-right a:hover {
-        text-decoration: underline;
+        transform: scale(1.05);
       }
       .notifications {
         position: relative;
@@ -61,33 +75,125 @@
         padding: 5px;
         font-size: 12px;
       }
-      .content-container {
+      .main-container {
         display: flex;
-        margin-top: 10vh;
         width: 100%;
+        margin-top: 8vh;
+      }
+      .menu-container {
+        width: 20%;
+        background-color: #f5f5f5;
         padding: 20px;
+        border-right: 1px solid #ccc;
+        position: fixed;
+        top: 8vh;
+        bottom: 0;
+        left: 0;
+        overflow-y: auto;
+      }
+      .content-container {
+        width: 80%;
+        margin-left: 20%;
+        padding: 0px 20px;
+      }
+      .dashboard-button {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        padding: 8px;
+        background-color: var(--secondary-color); /* Primary color */
+        color: #fff; /* Text color */
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease, transform 0.2s ease,
+          box-shadow 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+      }
+
+      .dashboard-button:hover {
+        background-color: var(--primary-color);
+        transform: scale(1.03);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      input[type="number"] {
+        appearance: textfield;
+      }
+
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0; /* Chrome, Safari, Edge, Opera */
+      }
+
+      .dashboard-button span.material-symbols-outlined {
+        font-size: 20px;
+        margin-right: 8px;
+        vertical-align: middle;
+        color: #fff;
+      }
+
+      .dashboard-button:hover span.material-symbols-outlined {
+        color: #f0f0f0;
       }
     </style>
-    {% block styles %}
-    <!-- Additional styles can be added by child templates -->
-    {% endblock %}
+    {% block styles %} {% endblock %}
   </head>
-  <body>
-    <header>
-      <h2>Employee Management System</h2>
+  <body class="global-body">
+    <header class="header">
+      <a href="{% url 'admin_dashboard:index' %}" id="home-a">
+        <h2>Employee Management System</h2>
+      </a>
       <div class="nav-right">
         <div class="notifications">
-          <a href="{% url 'admin_dashboard:notifications' %}">Notifications</a>
+          <a href="{% url 'admin_dashboard:my_account' %}">My Account</a>
+          <a href="{% url 'admin_dashboard:notifications' %}" class="right-menu"
+            >Notifications</a
+          >
           <span class="badge">3</span>
         </div>
-        <a href="{% url 'admin_dashboard:logout' %}">Logout</a>
+        <a href="{% url 'admin_dashboard:logout' %}" class="right-menu"
+          >Logout</a
+        >
       </div>
     </header>
-    <div class="content-container">
-      {% block content %}
-      <!-- Page-specific content will be rendered here -->
-      {% endblock %}
+    <div class="main-container">
+      <div class="menu-container">
+        <a
+          href="{% url 'admin_dashboard:add_employee' %}"
+          class="dashboard-button"
+        >
+          <span class="material-symbols-outlined"> person_add </span>
+          Add Employee
+        </a>
+        <a href="{% url 'admin_dashboard:index' %}" class="dashboard-button">
+          <span class="material-symbols-outlined">list</span>
+          Employee List
+        </a>
+        <a
+          href="{% url 'admin_dashboard:add_attendance' %}"
+          class="dashboard-button"
+        >
+          <span class="material-symbols-outlined">inventory</span>
+          Add Attendance
+        </a>
+        <a
+          href="{% url 'admin_dashboard:leave_requests' %}"
+          class="dashboard-button"
+        >
+          <span class="material-symbols-outlined">call_to_action</span>
+          Leave Requests
+        </a>
+        <a
+          href="{% url 'admin_dashboard:employee_update_requests' %}"
+          class="dashboard-button"
+        >
+          <span class="material-symbols-outlined">update</span>
+          Data Update Requests
+        </a>
+      </div>
+      <div class="content-container">{% block content %} {% endblock %}</div>
     </div>
-
   </body>
 </html>

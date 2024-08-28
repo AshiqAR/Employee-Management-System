@@ -1,12 +1,88 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Add Attendance{% endblock %}
+{% block title %}Add Attendance{% endblock %} 
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/add_attendance.css' %}" />
+{% endblock %}
 
 {% block content %}
-  <h2>Add Attendance</h2>
-  <form action="{% url 'admin_dashboard:add_attendance' %}" method="POST">
-    {% csrf_token %}
-    <!-- Form fields for attendance details -->
+
+<h2>Add Attendance</h2>
+<form action="{% url 'admin_dashboard:add_attendance' %}" method="POST">
+  {% csrf_token %}
+  <div class="form-section">
+    <label for="attendance_date">Select Date:</label>
+    <input
+      type="date"
+      id="attendance_date"
+      name="attendance_date"
+      max="{{ current_date }}"
+      required
+    />
+  </div>
+  <div class="form-section">
+    <label for="employee_search">Search Employee by Name:</label>
+    <input
+      type="text"
+      id="employee_search"
+      name="employee_search"
+      placeholder="Search by name..."
+      onkeyup="searchEmployee()"
+    />
+  </div>
+  <div class="form-section">
+    <table class="attendance-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Work Type</th>
+          <th>Attendance Status</th>
+          <th>Overtime Hours</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="employee-list">
+        {% for employee in employees %}
+        <tr>
+          <td>{{ employee.employee_id }}</td>
+          <td>{{ employee.first_name }} {{ employee.last_name }}</td>
+          <td>{{ employee.work_type }}</td>
+          <td>
+            <select name="attendance_status_{{ employee.employee_id }}">
+              <option value="Present">Present</option>
+              <option value="Absent">Absent</option>
+            </select>
+          </td>
+          <td>
+            <input
+              type="number"
+              name="overtime_hours_{{ employee.employee_id }}"
+              min="0"
+              max="8"
+              size="2"
+              placeholder="Hours"
+            />
+          </td>
+          <td>
+            <button
+              type="button"
+              onclick="saveAttendance('{{ employee.employee_id }}')"
+            >
+              Save
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="form-section">
     <button type="submit">Submit Attendance</button>
-  </form>
+  </div>
+</form>
+
+<script src="{% static 'scripts/add_attendance.js' %}"></script>
 {% endblock %}

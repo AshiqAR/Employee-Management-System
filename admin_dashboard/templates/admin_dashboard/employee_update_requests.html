@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Employee Data Update Requests{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/employee_update_requests.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="data-container">
+    <h2>Employee Data Update Requests</h2>
+    {% if update_requests.exists %}
+        <div class="requests-list">
+            {% for request in update_requests %}
+                <div class="request-item">
+                    <h3>Request ID: {{ request.request_id }}</h3>
+                    <p><strong>Employee Name:</strong> {{ request.employee_id.first_name }} {{ request.employee_id.last_name }}</p>
+                    <p><strong>Department:</strong> {{ request.employee_id.department.name }}</p>
+                    <p><strong>Designation:</strong> {{ request.employee_id.designation.designation_name }}</p>
+                    <p><strong>Requested Changes:</strong></p>
+                    <ul>
+                        <li><strong>Email:</strong> {{ request.email }}</li>
+                        <li><strong>Phone Number:</strong> {{ request.phone_number }}</li>
+                        <li><strong>Address:</strong> {{ request.address }}</li>
+                        <li><strong>Emergency Contact Name:</strong> {{ request.emergency_contact_name }}</li>
+                        <li><strong>Emergency Contact Number:</strong> {{ request.emergency_contact_number }}</li>
+                        <li><strong>Bank Name:</strong> {{ request.bank_name }}</li>
+                        <li><strong>Bank Account Number:</strong> {{ request.bank_account_number }}</li>
+                        <li><strong>IFSC Code:</strong> {{ request.ifsc_code }}</li>
+                        <li><strong>Experience Description:</strong> {{ request.experience_description }}</li>
+                    </ul>
+                    <p><strong>Submitted At:</strong> {{ request.created_at }}</p>
+                    <a href="{% url 'admin_dashboard:approve_update_request' request.request_id %}" class="btn approve-btn">Approve</a>
+                    <a href="{% url 'admin_dashboard:reject_update_request' request.request_id %}" class="btn reject-btn">Reject</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No update requests found.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -4,11 +4,115 @@
 {% block title %}Edit Employee Data{% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="{% static 'css/add_employee.css' %}" />
+<link rel="stylesheet" href="{% static 'css/edit_employee.css' %}" />
 {% endblock %}
 
 {% block content %}
-<div class="addemployee-container">
-    <h2>Edit Employee </h2>
+<div class="editemployee-container">
+    <h2>Edit Employee Data</h2>
+    <form method="POST" class="employee-form">
+        {% csrf_token %}
+        
+        <!-- Personal Data Section -->
+        <section class="form-section">
+            <h3 class="">Personal Data</h3>
+            <div class="form-group">
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name" value="{{ employee.first_name }}" required disabled>
+            </div>
+            <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" value="{{ employee.last_name }}" required disabled>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ employee.email }}" required>
+            </div>
+            <div class="form-group">
+                <label for="phone_number">Phone Number</label>
+                <input type="text" id="phone_number" name="phone_number" value="{{ employee.phone_number }}" required>
+            </div>
+            <div class="form-group">
+                <label for="date_of_birth">Date of Birth</label>
+                <input type="date" id="date_of_birth" name="date_of_birth" value="{{ employee.date_of_birth|date:'Y-m-d' }}" required disabled>
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" name="address" value="{{ employee.address }}" required>
+            </div>
+        </section>        
+
+        <!-- Supervisory Data Section -->
+        <section class="form-section">
+            <h3 class="section-heading">Supervisory Data</h3>
+            <div class="form-group">
+                <label for="supervisor_eid">Supervisor Employee ID</label>
+                <input type="number" 
+                    id="supervisor_eid" 
+                    name="supervisor_employee_id" 
+                    value="{{ employee.supervisor.employee_id }}"
+                >
+            </div>
+            <div class="form-group">
+                <label for="supervisor">Supervisor Name</label>
+                <input type="text" 
+                    id="supervisor" 
+                    name="supervisor"
+                    value="{{ employee.supervisor.first_name }} {{ employee.supervisor.last_name }}"
+                    disabled
+                >
+            </div>
+        </section>
+
+        <!-- Department Data Section -->
+        <section class="form-section">
+            <h3 class="section-heading">Department Data</h3>
+            <div class="form-group">
+                <label for="department">Department</label>
+                <select id="department" name="department" required>
+                    {% for department in departments %}
+                    <option value="{{ department.id }}" {% if employee.department.id == department.id %}selected{% endif %}>
+                        {{ department.department_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="designation">Designation</label>
+                <select id="designation" name="designation" required>
+                    {% for designation in designations %}
+                    <option value="{{ designation.id }}" {% if employee.designation.id == designation.id %}selected{% endif %}>
+                        {{ designation.designation_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="date_of_joining">Date of Joining</label>
+                <input type="date" id="date_of_joining" name="date_of_joining" value="{{ employee.date_of_joining|date:'Y-m-d' }}" required>
+            </div>
+        </section>
+
+        <!-- Work Experience Section -->
+        <section class="form-section">
+            <h3 class="section-heading">Work Experience</h3>
+            <div class="form-group full-width">
+                <label for="experience_description">Experience Description</label>
+                <textarea id="experience_description" name="experience_description" rows="4" required>{{ employee.experience_description }}</textarea>
+            </div>
+        </section>
+
+        <!-- Documents Section -->
+        <section class="form-section">
+            <h3 class="section-heading">Documents</h3>
+            <!-- Add document fields or links here -->
+            <p>Document upload/management section here</p>
+        </section>
+
+        <!-- Submit Button -->
+        <div class="form-group full-width">
+            <button type="submit" class="submit-button">Save Changes</button>
+        </div>
+    </form>
 </div>
 {% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Review Leave Request{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/review_leave_request.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="reviewleave-container">
+    <h2>Review Leave Request</h2>
+    <form action="{% url 'admin_dashboard:review_leave_request' leave_request.leave_request_id %}" method="POST" class="review-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Employee Name:</label>
+            <p>{{ leave_request.employee.first_name }} {{ leave_request.employee.last_name }}</p>
+        </div>
+
+        <div class="form-group">
+            <label>Leave Type:</label>
+            <p>{{ leave_request.leave_type }}</p>
+        </div>
+
+        <div class="form-group">
+            <label>Leave Dates:</label>
+            <p>{{ leave_request.start_date }} to {{ leave_request.end_date }}</p>
+        </div>
+
+        <div class="form-group">
+            <label>Reason:</label>
+            <p>{{ leave_request.reason }}</p>
+        </div>
+
+        <div class="form-group">
+            <label for="comments">Comments:</label>
+            <textarea id="comments" name="comments" placeholder="Add your remarks here..."></textarea>
+        </div>
+
+        <div class="form-group approval-dates">
+            <label>Approve Leave For:</label>
+            <div class="date-inputs">
+                <input type="date" id="approval_start_date" name="approval_start_date" value="{{ leave_request.start_date|date:'Y-m-d' }}" />
+                <input type="date" id="approval_end_date" name="approval_end_date" value="{{ leave_request.end_date|date:'Y-m-d' }}" />
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" name="action" value="approve" class="btn approve-btn">Approve</button>
+            <button type="submit" name="action" value="reject" class="btn reject-btn">Reject</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

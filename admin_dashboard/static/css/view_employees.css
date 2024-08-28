@@ -6,6 +6,7 @@
 
 .search-container {
   margin-bottom: 20px;
+  width: 50%;
 }
 
 #searchInput {
@@ -45,7 +46,8 @@ td {
 }
 
 th {
-  background-color: #f4f4f4;
+  background-color: var(--primary-color);
+  color: white;
   cursor: pointer;
 }
 
@@ -107,3 +109,4 @@ tr:hover {
 .pagination .active:hover {
   background-color: #007bff;
 }
+

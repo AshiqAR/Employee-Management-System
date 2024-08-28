@@ -44,3 +44,22 @@ class Document(models.Model):
     document_type = models.CharField(max_length=255)
     document_path = models.CharField(max_length=255)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    validated = models.BooleanField(default=False)
+
+class EmployeeUpdate(models.Model):
+    request_id = models.AutoField(primary_key=True)
+    employee_id = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='update_requests')
+    email = models.EmailField(unique=True, default=None)
+    phone_number = models.CharField(max_length=20, unique=True, default=None)
+    address = models.TextField(default=None)
+    emergency_contact_number = models.CharField(max_length=20, default=None)
+    emergency_contact_name = models.CharField(max_length=255, default=None)
+    bank_name = models.CharField(max_length=255, default=None)
+    bank_account_number = models.CharField(max_length=255, default=None)
+    ifsc_code = models.CharField(max_length=11, default=None)
+    experience_description = models.TextField(default=None)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.first_name + ' ' + self.last_name

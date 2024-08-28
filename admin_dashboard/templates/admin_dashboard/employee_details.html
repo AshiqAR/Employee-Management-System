@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Employee Details{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/employee_details.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="employee-details-container">
+    <section class="personal-info">
+        <h3>{{ employee.first_name }} {{ employee.last_name }}</h3>
+        <div class="edit-profile">
+            <a href="{% url 'admin_dashboard:edit_employee' employee.employee_id %}"
+                class="edit-employee-link"
+            >
+                <i class="fas fa-edit"></i> Edit Employee
+            </a>
+        </div>
+        <div class="info-row">
+            <p><strong>Employee ID:</strong> {{ employee.employee_id }}</p>
+        </div>
+        <div class="info-row">
+            <p><strong>Email:</strong> {{ employee.email }}</p>
+            <p><strong>Phone Number:</strong> {{ employee.phone_number }}</p>
+        </div>
+        <div class="info-row">
+            <p><strong>Date of Birth:</strong> {{ employee.date_of_birth }}</p>
+            <p><strong>Address:</strong> {{ employee.address }}</p>
+        </div>
+    </section>
+
+    <!-- Job Details -->
+    <section class="job-details">
+        <h3>Job Details</h3>
+        <div class="info-row">
+            <p><strong>Date of Joining:</strong> {{ employee.date_of_joining }}</p>
+            <p><strong>Department:</strong> {{ employee.department.department_name }}</p>
+        </div>
+        <div class="info-row">
+            <p><strong>Designation:</strong> {{ employee.designation.designation_name }}</p>
+            <p><strong>Supervisor:</strong> {{ employee.supervisor.first_name }} {{ employee.supervisor.last_name }}</p>
+        </div>
+    </section>
+
+    <!-- Emergency Contact -->
+    <section class="emergency-contact">
+        <h3>Emergency Contact</h3>
+        <div class="info-row">
+            <p><strong>Contact Name:</strong> {{ employee.emergency_contact_name }}</p>
+            <p><strong>Contact Number:</strong> {{ employee.emergency_contact_number }}</p>
+        </div>
+    </section>
+
+    <!-- Bank Details -->
+    <section class="bank-details">
+        <h3>Bank Details</h3>
+        <div class="info-row">
+            <p><strong>Bank Name:</strong> {{ employee.bank_name }}</p>
+            <p><strong>Account Number:</strong> {{ employee.bank_account_number }}</p>
+        </div>
+        <div class="info-row">
+            <p><strong>IFSC Code:</strong> {{ employee.ifsc_code }}</p>
+        </div>
+    </section>
+
+    <!-- Experience Description -->
+    <section class="experience-description">
+        <h3>Experience</h3>
+        <p>{{ employee.experience_description }}</p>
+    </section>
+
+    <!-- Attendance Records -->
+    <section class="attendance-records">
+        <h3>Attendance</h3>
+        {% if attendance %}
+            <p><strong>Status:</strong> {{ attendance.attendance_type }}</p>
+            <p><strong>Checked In:</strong> {{ attendance.check_in }}</p>
+            <p><strong>Checked Out:</strong> {{ attendance.check_out }}</p>
+        {% else %}
+            <p>No attendance recorded for today.</p>
+        {% endif %}
+    </section>
+
+    <!-- Documents -->
+    <section class="documents">
+        <h3>Documents</h3>
+        {% if documents %}
+            <ul>
+                {% for document in documents %}
+                    <li><a href="{{ document.file.url }}">{{ document.file.name }}</a></li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No documents uploaded.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

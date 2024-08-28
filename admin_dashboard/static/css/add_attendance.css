@@ -1,0 +1,43 @@
+.form-section {
+    margin-bottom: 10px;
+  }
+
+  .attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .attendance-table th,
+  .attendance-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+
+  .attendance-table th {
+    background-color: var(--primary-color);
+    color: white;
+  }
+
+  .attendance-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+
+  .attendance-table tr:hover {
+    background-color: #ddd;
+  }
+
+  .attendance-table button {
+    padding: 6px 12px; /* Adjusted padding for the button */
+    font-size: 12px; /* Adjusted font size */
+  }
+
+  .form-section input[type="date"] {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .form-section input[type="text"] {
+    padding: 8px;
+    font-size: 14px;
+  }

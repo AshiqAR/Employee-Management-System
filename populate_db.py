@@ -177,7 +177,30 @@ def add_attendance():
     # a.save()
     return a
 
+
+def add_leave_request():
+    e = Employee.objects.order_by('?').first()
+    leave_type = random.choice(['Casual', 'Sick', 'Earned'])
+    start_date = fakegen.date_this_year()
+    end_date = start_date + datetime.timedelta(days=random.randint(1, 10))
+    leave_reason = fakegen.text()
+    leave_status = 'Pending'
+    created_at = fakegen.date_time_this_decade()
+    updated_at = fakegen.date_time_this_decade()
+    
+    lr = LeaveRequest.objects.get_or_create(
+        employee=e,
+        leave_type=leave_type,
+        start_date=start_date,
+        end_date=end_date,
+        reason=leave_reason,
+        status=leave_status,
+        requested_at=created_at,
+    )[0]
+    # lr.save()
+    return lr
+
 if __name__ == '__main__':
     print("Populating the database...Please wait")
     for _ in range(10):
-        add_employee()
+        add_leave_request()

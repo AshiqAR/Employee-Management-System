@@ -1,0 +1,104 @@
+/* General container styling */
+.reviewleave-container {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #fefefe;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.reviewleave-container h2 {
+    margin-bottom: 25px;
+    text-align: center;
+    color: var(--primary-color);
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* Form group styling */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-group p {
+    margin: 0;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* Textarea styling */
+textarea {
+    width: 100%;
+    height: 100px;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    resize: vertical;
+}
+
+/* Select and date input styling */
+select, input[type="date"] {
+    width: 48%;
+    padding: 10px;
+    margin-right: 4%;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+input[type="date"] {
+    margin-bottom: 10px;
+}
+
+/* Approval dates container */
+.approval-dates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4%;
+}
+
+.date-inputs {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+/* Submit button styling */
+button[type="submit"] {
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 16px;
+    display: block;
+    margin-top: 20px;
+    max-width: 200px;
+}
+
+button[value="approve"]{
+    background-color: green;
+}
+
+button[value="reject"]{
+    background-color: red;
+}
+
+.form-actions{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
