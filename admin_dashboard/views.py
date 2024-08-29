@@ -127,7 +127,7 @@ def my_account_view(request):
             else:
                 user.username = new_username
                 user.save()
-                messages.success(request, 'Username successfully changed.')
+                messages.success(request, 'Username changed successfully.')
                 return redirect('admin_dashboard:my_account')
 
         elif action == 'change_password':
@@ -146,7 +146,7 @@ def my_account_view(request):
                 user.set_password(new_password)
                 user.save()
                 update_session_auth_hash(request, user)
-                messages.success(request, 'Password successfully changed.')
+                messages.success(request, 'Password changed successfully.')
                 return redirect('admin_dashboard:my_account')
 
     return render(request, 'admin_dashboard/my_account.html', context)
