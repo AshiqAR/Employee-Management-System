@@ -5,7 +5,7 @@ app_name = 'admin_dashboard'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('my_account/', views.my_account, name='my_account'),
+    path('my_account/', views.my_account_view, name='my_account'),
     path('add_employee/', views.add_employee, name='add_employee'),
     path('add_attendance/', views.add_attendance, name='add_attendance'),
     path('leave_requests/', views.leave_requests, name='leave_requests'),

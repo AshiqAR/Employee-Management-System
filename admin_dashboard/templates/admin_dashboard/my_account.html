@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Account{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/my_account.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="my-account-container">
+    <h2>My Account</h2>
+    <div class="account-details">
+
+        <div class="account-info">
+            <h3>Personal Information</h3>
+            <div class="form-group">
+                <label>Name</label>
+                <p>{{ employee.first_name }} {{ employee.last_name }}</p>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <p>{{ employee.email }}</p>
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <p>{{ employee.role|title }}</p>
+            </div>
+        </div>
+
+        <div class="change-username-container">
+            <h3>Change Username</h3>
+            <form method="post" action="{% url 'admin_dashboard:my_account' %}" class="change-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="current_username">Current Username</label>
+                    <p>{{ user.username }}</p>
+                </div>
+                <div class="form-group">
+                    <label for="new_username">New Username</label>
+                    <input type="text" id="new_username" name="new_username" placeholder="New Username" required />
+                </div>
+                {% if username_error %}
+                <p class="error-message">{{ username_error }}</p>
+                {% endif %}
+                <button type="submit" name="action" value="change_username" class="submit-button">Change Username</button>
+            </form>
+        </div>
+
+        <div class="change-password-container">
+            <h3>Change Password</h3>
+            <form method="post" action="{% url 'admin_dashboard:my_account' %}" class="change-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="current_password">Current Password</label>
+                    <input type="password" id="current_password" name="current_password" placeholder="Current Password" required />
+                </div>
+                <div class="form-group">
+                    <label for="new_password">New Password</label>
+                    <input type="password" id="new_password" name="new_password" placeholder="New Password" required />
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required />
+                </div>
+                {% if password_error %}
+                <p class="error-message">{{ password_error }}</p>
+                {% endif %}
+                {% if password_mismatch %}
+                <p class="error-message">{{ password_mismatch }}</p>
+                {% endif %}
+                <button type="submit" name="action" value="change_password" class="submit-button">Change Password</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+

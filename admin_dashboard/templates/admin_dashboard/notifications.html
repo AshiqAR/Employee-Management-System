@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/notifications.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="notifications-container">
+    <h2>Notifications</h2>
+    <h4>No Notifications</h4>
+</div>
+{% endblock %}

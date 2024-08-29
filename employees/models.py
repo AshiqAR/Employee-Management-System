@@ -3,6 +3,10 @@ import uuid
 from departments.models import Department
 from django.contrib.auth.models import User
 
+class Roles(models.TextChoices):
+    HR = 'hr', 'HR'
+    EMPLOYEE = 'employee', 'Employee'
+
 class Designation(models.Model):
     designation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     designation_name = models.CharField(max_length=255)
@@ -28,6 +32,7 @@ class Employee(models.Model):
     bank_account_number = models.CharField(max_length=255)
     ifsc_code = models.CharField(max_length=11)
     experience_description = models.TextField()
+    role = models.CharField(max_length=20, choices=Roles.choices, default='employee')
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='employees')
     supervisor = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='subordinates')
     designation = models.ForeignKey(Designation, on_delete=models.CASCADE)

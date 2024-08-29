@@ -1,12 +1,25 @@
 from django.utils import timezone
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth import logout
-from django.http import HttpResponse
-
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth import logout, update_session_auth_hash
+from django.http import HttpResponse
+from django.contrib import messages
+
 from employees.models import Designation, Employee, Document, EmployeeUpdate
 from attendance.models import Attendance
 from leave.models import Leave, LeaveRequest
+from django.contrib.auth.models import User
+
+def validate_password(password):
+    if len(password) < 8:
+        return False, 'Password must be at least 8 characters long.'
+    if not any(char.isdigit() for char in password):
+        return False, 'Password must contain at least one digit.'
+    if not any(char.isupper() for char in password):
+        return False, 'Password must contain at least one uppercase letter.'
+    if not any(char.islower() for char in password):
+        return False, 'Password must contain at least one lowercase letter.'
+    return True, None
 
 def group_required(group_name):
     def in_group(user):
@@ -62,7 +75,7 @@ def review_leave_request(request, leave_request_id):
 
 @group_required('hr')
 def notifications(request):
-    return HttpResponse("Hello, world. You're at the notifications page.")
+    return render(request, 'admin_dashboard/notifications.html')
 
 @group_required('hr')
 def logout_view(request):
@@ -95,8 +108,49 @@ def employee_details(request, employee_id):
     return render(request, 'admin_dashboard/employee_details.html', context)
 
 @group_required('hr')
-def my_account(request):
-    return HttpResponse("You're at the My Account page.")
+def my_account_view(request):
+    user = get_object_or_404(User, id=request.user.id)
+    employee = get_object_or_404(Employee, user_account=user)
+
+    context = {
+        'user': user,
+        'employee': employee,
+    }
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'change_username':
+            new_username = request.POST.get('new_username')
+            if User.objects.filter(username=new_username).exists():
+                context['username_error'] = 'Username already exists.'
+            else:
+                user.username = new_username
+                user.save()
+                messages.success(request, 'Username successfully changed.')
+                return redirect('admin_dashboard:my_account')
+
+        elif action == 'change_password':
+            current_password = request.POST.get('current_password')
+            new_password = request.POST.get('new_password')
+            confirm_password = request.POST.get('confirm_password')
+            is_valid, error = validate_password(new_password)
+
+            if not user.check_password(current_password):
+                context['password_error'] = 'Current password is incorrect.'
+            elif new_password != confirm_password:
+                context['password_mismatch'] = 'Passwords do not match.'
+            elif not is_valid: 
+                context['password_error'] = error
+            else:
+                user.set_password(new_password)
+                user.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, 'Password successfully changed.')
+                return redirect('admin_dashboard:my_account')
+
+    return render(request, 'admin_dashboard/my_account.html', context)
+
 
 @group_required('hr')
 def employee_update_requests(request):

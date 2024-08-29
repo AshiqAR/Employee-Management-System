@@ -1,7 +1,6 @@
 from django.db import models
 import uuid
 from employees.models import Employee
-from enum import Enum
 
 class WorkType(models.TextChoices):
     WORK_FROM_HOME = 'WorkFromHome', 'Work From Home'
