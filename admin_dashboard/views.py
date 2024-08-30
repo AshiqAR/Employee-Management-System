@@ -23,7 +23,7 @@ def validate_password(password):
 
 def group_required(group_name):
     def in_group(user):
-        return user.groups.filter(name=group_name).exists()
+        return user.is_authenticated and user.groups.filter(name=group_name).exists()
     return user_passes_test(in_group)
 
 @group_required('hr')

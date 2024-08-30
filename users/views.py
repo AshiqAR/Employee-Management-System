@@ -19,9 +19,10 @@ def login_view(request):
         authenticated_user = authenticate(username=username, password=password)
         if authenticated_user is not None and authenticated_user.is_active and not authenticated_user.is_superuser:
             login(request, authenticated_user)
+            print(role)
             if role == 'admin' and is_in_group(authenticated_user, 'hr'):
                 return redirect('admin_dashboard:index')
-            elif role == 'employee' and is_in_group(authenticated_user, 'employees'):
+            elif role == 'employee' and is_in_group(authenticated_user, 'employee'):
                 return redirect('employees:index')
             else:
                 messages.error(request, "Invalid Credentials.")
