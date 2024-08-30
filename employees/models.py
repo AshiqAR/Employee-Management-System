@@ -26,17 +26,26 @@ class Employee(models.Model):
     date_of_birth = models.DateField()
     date_of_joining = models.DateField()
     address = models.TextField()
+    has_profile_edit = models.BooleanField(default=False)
+
     emergency_contact_number = models.CharField(max_length=20)
     emergency_contact_name = models.CharField(max_length=255)
+    emergency_contact_relationship = models.CharField(max_length=255, default='Emergency Contact')
+
     bank_name = models.CharField(max_length=255)
     bank_account_number = models.CharField(max_length=255)
     ifsc_code = models.CharField(max_length=11)
+    bank_branch = models.CharField(max_length=255)
+    has_bank_account_edit = models.BooleanField(default=False)
+
     experience_description = models.TextField()
     role = models.CharField(max_length=20, choices=Roles.choices, default='employee')
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='employees')
     supervisor = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='subordinates')
     designation = models.ForeignKey(Designation, on_delete=models.CASCADE)
     user_account = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -47,6 +56,7 @@ class Document(models.Model):
     document_id = models.AutoField(primary_key=True)
     employee_id = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='documents')
     document_type = models.CharField(max_length=255)
+    document_description = models.TextField()
     document_path = models.CharField(max_length=255)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     validated = models.BooleanField(default=False)
@@ -59,10 +69,19 @@ class EmployeeUpdate(models.Model):
     address = models.TextField(default=None)
     emergency_contact_number = models.CharField(max_length=20, default=None)
     emergency_contact_name = models.CharField(max_length=255, default=None)
+    emergency_contact_relationship = models.CharField(max_length=255, default='Emergency Contact')
+
     bank_name = models.CharField(max_length=255, default=None)
     bank_account_number = models.CharField(max_length=255, default=None)
     ifsc_code = models.CharField(max_length=11, default=None)
+    bank_branch = models.CharField(max_length=255, default=None)
+
     experience_description = models.TextField(default=None)
+    role = models.CharField(max_length=20, choices=Roles.choices, default='employee')
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='update_requests',default=None)
+    supervisor = models.ForeignKey(Employee, null=True, blank=True, on_delete=models.SET_NULL, related_name='subordinate_requests')
+    designation = models.ForeignKey(Designation, on_delete=models.CASCADE, default=None)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

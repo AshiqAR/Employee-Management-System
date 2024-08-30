@@ -1,10 +1,10 @@
-{% extends "admin_dashboard/base.html" %}
+{% extends "employees/base.html" %}
 {% load static %}
 
 {% block title %}My Account{% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="{% static 'css/my_account.css' %}" />
+<link rel="stylesheet" href="{% static 'css/my_account_emp.css' %}" />
 {% endblock %}
 
 {% block content %}
@@ -17,28 +17,10 @@
     </div>
     {% endif %}
         
-    <h2>My Account</h2>
     <div class="account-details">
-
-        <div class="account-info">
-            <h3>Personal Information</h3>
-            <div class="form-group">
-                <label>Name</label>
-                <p>{{ employee.first_name }} {{ employee.last_name }}</p>
-            </div>
-            <div class="form-group">
-                <label>Email</label>
-                <p>{{ employee.email }}</p>
-            </div>
-            <div class="form-group">
-                <label>Role</label>
-                <p>{{ employee.role|upper }}</p>
-            </div>
-        </div>
-
         <div class="change-username-container">
             <h3>Change Username</h3>
-            <form method="post" action="{% url 'admin_dashboard:my_account' %}" class="change-form">
+            <form method="post" action="{% url 'employees:my_account' %}" class="change-form">
                 {% csrf_token %}
                 <div class="form-group">
                     <label>Current Username</label>
@@ -57,7 +39,7 @@
 
         <div class="change-password-container">
             <h3>Change Password</h3>
-            <form method="post" action="{% url 'admin_dashboard:my_account' %}" class="change-form">
+            <form method="post" action="{% url 'employees:my_account' %}" class="change-form">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="current_password">Current Password</label>

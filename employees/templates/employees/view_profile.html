@@ -1,0 +1,276 @@
+{% extends "employees/base.html" %}
+{% load static %}
+{% block title %}View Profile{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/view_profile.css' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+
+  <!-- Personal Details Section -->
+  <div class="section personal-details">
+    <h3>Personal Details</h3>
+    {% if employee.has_profile_edit %}
+      <p>Your personal details update is currently under review. Requested changes:</p>
+      <ul>
+        {% if updated_employee_personal.email != employee.email %}
+        <li>Email: {{ updated_employee_personal.email }}</li>
+        {% endif %}
+        {% if updated_employee_personal.phone_number != employee.phone_number %}
+        <li>Phone Number: {{ updated_employee_personal.phone_number }}</li>
+        {% endif %}
+        {% if updated_employee_personal.address != employee.address %}
+        <li>Address: {{ updated_employee_personal.address }}</li>
+        {% endif %}
+        {% if updated_employee_personal.emergency_contact_name != employee.emergency_contact_name %}
+        <li>Emergency Contact Name: {{ updated_employee_personal.emergency_contact_name }}</li>
+        {% endif %}
+        {% if updated_employee_personal.emergency_contact_number != employee.emergency_contact_number %}
+        <li>Emergency Contact Number: {{ updated_employee_personal.emergency_contact_number }}</li>
+        {% endif %}
+        {% if updated_employee_personal.emergency_contact_relationship != employee.emergency_contact_relationship %}
+        <li>Emergency Contact Relationship: {{ updated_employee_personal.emergency_contact_relationship }}</li>
+        {% endif %}
+      </ul>
+    {% endif %}
+    <form class="grid-container" method="POST" action="{% url 'employees:update_personal_details' %}">
+      {% csrf_token %}
+      {% for field in personal_form %}
+      <div class="form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+        <ul class="errorlist">
+          {% for error in field.errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endfor %}      
+
+      <div class="button-group" id="personal-submit-cancel-button-div">
+        <button type="submit" class="edit-button" id="submit-personal">Submit</button>
+        <button type="button" class="cancel-button" id="cancel-personal">Cancel</button>
+      </div>
+    </form>
+    <button class="update-button" id="update-personal-details">Update Personal Details</button>
+  </div>
+
+  <!-- Bank Account Details Section -->
+  <div class="section bank-details">
+    <h3>Bank Account Details</h3>
+    {% if employee.has_bank_edit %}
+      <p>Your bank details update is currently under review. Requested changes:</p>
+      <ul>
+        {% if updated_employee_bank.bank_name != employee.bank_name %}
+        <li>Bank Name: {{ updated_employee_bank.bank_name }}</li>
+        {% endif %}
+        {% if updated_employee_bank.bank_account_number != employee.bank_account_number %}
+        <li>Account Number: {{ updated_employee_bank.bank_account_number }}</li>
+        {% endif %}
+        {% if updated_employee_bank.ifsc_code != employee.ifsc_code %}
+        <li>IFSC Code: {{ updated_employee_bank.ifsc_code }}</li>
+        {% endif %}
+        {% if updated_employee_bank.bank_branch != employee.bank_branch %}
+        <li>Bank Branch: {{ updated_employee_bank.bank_branch }}</li>
+        {% endif %}
+      </ul>
+    {% else %}
+    <form class="grid-container" method="POST" action="{% url 'employees:update_bank_details' %}">
+      {% csrf_token %}
+      {% for field in bank_form %}
+      <div class="form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+        <ul class="errorlist">
+          {% for error in field.errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      {% endfor %}
+      <div class="button-group" id="bank-submit-cancel-button-div">
+        <button type="submit" class="edit-button" id="submit-bank">Submit</button>
+        <button type="button" class="cancel-button" id="cancel-bank">Cancel</button>
+      </div>
+    </form>
+    <button class="update-button" id="update-bank-details">Update Bank Account Details</button>
+    {% endif %}
+  </div>
+
+  <!-- Documents Section -->
+  <div class="section documents">
+    <h3>Uploaded Documents</h3>
+    <form method="POST" action="{% url 'employees:add_document' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="document">Upload Document</label>
+        <input type="file" id="document" name="document" />
+      </div>
+      {% if document_form.errors %}
+      <div class="form-group error-messages">
+        <ul>
+          {% for field in document_form %}
+          {% for error in field.errors %}
+          <li>{{ error }}</li>
+          {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      <button type="submit" class="edit-button">Submit</button>
+    </form>
+    <div class="documents-list">
+      {% if employee.documents.all %}
+      <ul>
+        {% for document in employee.documents.all %}
+        <li>
+          {{ document.document_type }} -
+          <a href="{{ document.document_path }}">View Document</a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No documents uploaded.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+  let personalFormInitialValues = {};
+  let bankFormInitialValues = {};
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Set the initial state of the buttons and fields
+    initializeFormStates();
+  });
+
+  function initializeFormStates() {
+    var buttonGroupDiv = document.getElementById('personal-submit-cancel-button-div');
+    var updateButton = document.getElementById('update-personal-details');
+
+    buttonGroupDiv.style.display = 'none';
+    updateButton.style.display = 'block';
+
+    buttonGroupDiv = document.getElementById('bank-submit-cancel-button-div');
+    updateButton = document.getElementById('update-bank-details');
+
+    buttonGroupDiv.style.display = 'none';
+    updateButton.style.display = 'block';
+
+    var fields = document.querySelectorAll(`.personal-details input`);
+    var textareas = document.querySelectorAll(`.personal-details textarea`);
+
+    fields.forEach(field => {
+      field.disabled = true;
+    });
+    textareas.forEach(field => {
+      field.disabled = true;
+    });
+
+    fields = document.querySelectorAll(`.bank-details input`);
+    textareas = document.querySelectorAll(`.bank-details textarea`);
+
+    fields.forEach(field => {
+      field.disabled = true;
+    });
+    textareas.forEach(field => {
+      field.disabled = true;
+    });
+  }
+
+  function toggleEditMode(section) {
+    // Toggle visibility of buttons and disable fields
+    toggleButtonVisibility(section);
+    toggleDisable(section);
+  }
+
+  function toggleButtonVisibility(section) {
+    const buttonGroupDiv = document.getElementById(`${section}-submit-cancel-button-div`);
+    const updateButton = document.getElementById(`update-${section}-details`);
+
+    if (buttonGroupDiv.style.display === 'none') {
+      buttonGroupDiv.style.display = 'block';
+      updateButton.style.display = 'none';
+    } else {
+      buttonGroupDiv.style.display = 'none';
+      updateButton.style.display = 'block';
+    }
+  }
+
+  function toggleDisable(section) {
+    const fields = document.querySelectorAll(`.${section}-details input`);
+    const textareas = document.querySelectorAll(`.${section}-details textarea`);
+
+    fields.forEach(field => {
+      field.disabled = !field.disabled;
+    });
+    textareas.forEach(field => {
+      field.disabled = !field.disabled;
+    });
+  }
+
+  function saveInitialValues(section) {
+    const form = document.querySelector(`.${section}-details`);
+    const fields = form.querySelectorAll('input, textarea');
+
+    if (section === 'personal') {
+      personalFormInitialValues = {};
+    } else if (section === 'bank') {
+      bankFormInitialValues = {};
+    }
+
+    fields.forEach(field => {
+      if (field.name) {
+        if (section === 'personal') {
+          personalFormInitialValues[field.name] = field.value;
+        } else if (section === 'bank') {
+          bankFormInitialValues[field.name] = field.value;
+        }
+      }
+    });
+  }
+
+  function revertInitialValues(section) {
+    const form = document.querySelector(`.${section}-details`);
+    const fields = form.querySelectorAll('input, textarea');
+
+    fields.forEach(field => {
+      if (field.name) {
+        if (section === 'personal') {
+          field.value = personalFormInitialValues[field.name] || '';
+        } else if (section === 'bank') {
+          field.value = bankFormInitialValues[field.name] || '';
+        }
+      }
+    });
+  }
+
+  document.getElementById('update-personal-details').addEventListener('click', function() {
+    saveInitialValues('personal');
+    toggleEditMode('personal');
+  });
+
+  document.getElementById('update-bank-details').addEventListener('click', function() {
+    saveInitialValues('bank');
+    toggleEditMode('bank');
+  });
+
+  document.getElementById('cancel-personal').addEventListener('click', function() {
+    revertInitialValues('personal');
+    toggleEditMode('personal');
+  });
+
+  document.getElementById('cancel-bank').addEventListener('click', function() {
+    revertInitialValues('bank');
+    toggleEditMode('bank');
+  });
+</script>
+
+{% endblock %}

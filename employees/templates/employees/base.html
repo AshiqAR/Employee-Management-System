@@ -143,7 +143,7 @@
   <body class="global-body">
     <header class="header">
       <a href="{% url 'employees:index' %}" id="home-a">
-        <h2>EMS Innovin Labs</h2>
+        <h2>EMS</h2>
       </a>
       <div class="nav-right">
         <div class="notifications">
@@ -160,17 +160,17 @@
     <div class="main-container">
       <div class="menu-container">
         <a
-          href="{% url 'admin_dashboard:add_employee' %}"
+          href="{% url 'employees:view_profile' %}"
           class="dashboard-button"
         >
-          <span class="material-symbols-outlined"> person_add </span>
-          Edit Details
+          <span class="material-symbols-outlined"> edit </span>
+          Update Profile
         </a>
         <a
-          href="{% url 'admin_dashboard:add_employee' %}"
+          href="{% url 'employees:leave_applications' %}"
           class="dashboard-button"
         >
-          <span class="material-symbols-outlined"> person_add </span>
+          <span class="material-symbols-outlined"> article </span>
           Leave Applications
         </a>
         

@@ -1,0 +1,38 @@
+{% extends "employees/base.html" %}
+{% load static %}
+
+{% block title %}Leave Applications{% endblock %}
+
+{% block styles %}
+
+<link rel="stylesheet" href="{% static 'css/leave_applications.css' %}" />
+
+{% endblock %}
+
+{% block content %}
+<h2>Leave Applications</h2>
+<div class="leave-applications-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Leave Type</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for leave_application in leave_applications %}
+            <tr>
+                <td>{{ leave_application.leave_type }}</td>
+                <td>{{ leave_application.start_date }}</td>
+                <td>{{ leave_application.end_date }}</td>
+                <td>{{ leave_application.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+{% endblock %}
+
