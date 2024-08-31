@@ -3,11 +3,16 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib import messages
-from django import forms
+from django.contrib.messages import get_messages
 
-from .forms import PersonalDetailsForm, BankDetailsForm
+from .forms import PersonalDetailsForm, BankDetailsForm, DocumentForm
 from django.contrib.auth.models import User
 from .models import Employee, Document, EmployeeUpdate
+
+def clear_messages(request):
+    storage = messages.get_messages(request)
+    for message in storage:
+        pass
 
 def group_required(group_name):
     def in_group(user):
@@ -29,8 +34,8 @@ def get_employee_profile_context(user):
     employee = get_object_or_404(Employee, user_account=user)
     employee_docs = Document.objects.filter(employee_id=employee.employee_id)
     
-    updated_employee_personal = EmployeeUpdate.objects.filter(employee_id=employee).last()
-    updated_employee_bank = EmployeeUpdate.objects.filter(employee_id=employee).last()
+    updated_employee_personal = EmployeeUpdate.objects.filter(employee_id=employee, profile_edit=True).last()
+    updated_employee_bank = EmployeeUpdate.objects.filter(employee_id=employee, bank_edit=True).last()
     
     context = {
         'employee': employee,
@@ -39,6 +44,7 @@ def get_employee_profile_context(user):
         'updated_employee_bank': updated_employee_bank,
         'personal_form': PersonalDetailsForm(instance=employee),
         'bank_form': BankDetailsForm(instance=employee),
+        'document_form': DocumentForm(),
     }
     
     return context
@@ -133,38 +139,48 @@ def logout_view(request):
 @group_required('employee')
 def view_profile_view(request):
     context = get_employee_profile_context(request.user)
+    clear_messages(request)
     return render(request, 'employees/view_profile.html', context)
 
 @group_required('employee')
 def update_personal_details(request):
     employee = get_object_or_404(Employee, user_account=request.user)
+    clear_messages(request)
 
     if request.method == 'POST':
         if employee.has_profile_edit:
             messages.error(request, 'You already have a pending request to update your personal details.')
             return redirect('employees:view_profile')
         
-        form = PersonalDetailsForm(request.POST, instance=employee)
+        form = PersonalDetailsForm(request.POST)
         if form.is_valid():
             update_fields = {}
             for field in form.cleaned_data:
                 new_value = form.cleaned_data[field]
-                old_value = getattr(employee, field)
-                if new_value != old_value:
+                old_value = employee.__dict__[field]
+                if new_value != old_value and new_value is not None:
                     update_fields[field] = new_value
-            
+
+            print("Form is valid. Update fields:", update_fields)
+
             if update_fields:
-                # EmployeeUpdate.objects.create(
-                #     employee_id=employee,
-                #     email=update_fields.get('email', employee.email),
-                #     phone_number=update_fields.get('phone_number', employee.phone_number),
-                #     address=update_fields.get('address', employee.address),
-                #     emergency_contact_name=update_fields.get('emergency_contact_name', employee.emergency_contact_name),
-                #     emergency_contact_number=update_fields.get('emergency_contact_number', employee.emergency_contact_number),
-                #     emergency_contact_relationship=update_fields.get('emergency_contact_relationship', employee.emergency_contact_relationship),
-                # )
-                # employee.has_profile_edit = True
-                # employee.save()
+                try:
+                    print("Creating EmployeeUpdate with fields:", update_fields)
+                    EmployeeUpdate.objects.create(
+                        employee_id=employee,
+                        email=update_fields.get('email', employee.email),
+                        phone_number=update_fields.get('phone_number', employee.phone_number),
+                        address=update_fields.get('address', employee.address),
+                        emergency_contact_name=update_fields.get('emergency_contact_name', employee.emergency_contact_name),
+                        emergency_contact_number=update_fields.get('emergency_contact_number', employee.emergency_contact_number),
+                        emergency_contact_relationship=update_fields.get('emergency_contact_relationship', employee.emergency_contact_relationship),
+                        profile_edit=True
+                    )
+                    employee.has_profile_edit = True
+                    employee.save()
+                    print("EmployeeUpdate created successfully.")
+                except Exception as e:
+                    print("Error creating EmployeeUpdate:", e)
 
                 messages.success(request, 'Your personal details update has been saved and will be reflected after validation.')
             else:
@@ -172,23 +188,26 @@ def update_personal_details(request):
 
             return redirect('employees:view_profile')
         else:
+            print("Form is invalid. Errors:", form.errors)
             messages.error(request, 'Please correct the errors below.')
-    
+
     context = get_employee_profile_context(request.user)
     context['personal_form'] = form
 
     return render(request, 'employees/view_profile.html', context)
 
+
 @group_required('employee')
 def update_bank_details(request):
     employee = get_object_or_404(Employee, user_account=request.user)
+    clear_messages(request)
 
     if request.method == 'POST':
-        if employee.has_bank_edit:
+        if employee.has_bank_account_edit:
             messages.error(request, 'You already have a pending request to update your bank details.')
             return redirect('employees:view_profile')
         
-        form = BankDetailsForm(request.POST, instance=employee)
+        form = BankDetailsForm(request.POST)
         if form.is_valid():
             update_fields = {}
             for field in form.cleaned_data:
@@ -204,6 +223,7 @@ def update_bank_details(request):
                     bank_account_number=update_fields.get('bank_account_number', employee.bank_account_number),
                     ifsc_code=update_fields.get('ifsc_code', employee.ifsc_code),
                     bank_branch=update_fields.get('bank_branch', employee.bank_branch),
+                    bank_edit=True
                 )
                 employee.has_bank_edit = True
                 employee.save()

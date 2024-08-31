@@ -8,6 +8,15 @@
 
 {% block content %}
 <div class="profile-container">
+  {% if messages %}
+    <div class="message-popup" id="pop-up-message-div">
+      {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 
   <!-- Personal Details Section -->
   <div class="section personal-details">
@@ -49,8 +58,7 @@
         </ul>
         {% endif %}
       </div>
-      {% endfor %}      
-
+      {% endfor %}
       <div class="button-group" id="personal-submit-cancel-button-div">
         <button type="submit" class="edit-button" id="submit-personal">Submit</button>
         <button type="button" class="cancel-button" id="cancel-personal">Cancel</button>
@@ -62,7 +70,7 @@
   <!-- Bank Account Details Section -->
   <div class="section bank-details">
     <h3>Bank Account Details</h3>
-    {% if employee.has_bank_edit %}
+    {% if employee.has_bank_account_edit %}
       <p>Your bank details update is currently under review. Requested changes:</p>
       <ul>
         {% if updated_employee_bank.bank_name != employee.bank_name %}
@@ -78,7 +86,7 @@
         <li>Bank Branch: {{ updated_employee_bank.bank_branch }}</li>
         {% endif %}
       </ul>
-    {% else %}
+    {% endif %}
     <form class="grid-container" method="POST" action="{% url 'employees:update_bank_details' %}">
       {% csrf_token %}
       {% for field in bank_form %}
@@ -100,16 +108,30 @@
       </div>
     </form>
     <button class="update-button" id="update-bank-details">Update Bank Account Details</button>
-    {% endif %}
   </div>
 
   <!-- Documents Section -->
   <div class="section documents">
     <h3>Uploaded Documents</h3>
+    <div class="documents-list">
+      {% if documents %}
+      <ul>
+        {% for document in documents %}
+        <li>
+          {{ document.document_type }} -
+          <a href="{{ document.document_path }}">View Document</a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No documents uploaded.</p>
+      {% endif %}
+    </div>
+
     <form method="POST" action="{% url 'employees:add_document' %}" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="form-group">
-        <label for="document">Upload Document</label>
+        <label for="document">Upload Documents</label>
         <input type="file" id="document" name="document" />
       </div>
       {% if document_form.errors %}
@@ -125,20 +147,6 @@
       {% endif %}
       <button type="submit" class="edit-button">Submit</button>
     </form>
-    <div class="documents-list">
-      {% if employee.documents.all %}
-      <ul>
-        {% for document in employee.documents.all %}
-        <li>
-          {{ document.document_type }} -
-          <a href="{{ document.document_path }}">View Document</a>
-        </li>
-        {% endfor %}
-      </ul>
-      {% else %}
-      <p>No documents uploaded.</p>
-      {% endif %}
-    </div>
   </div>
 </div>
 
@@ -186,7 +194,6 @@
   }
 
   function toggleEditMode(section) {
-    // Toggle visibility of buttons and disable fields
     toggleButtonVisibility(section);
     toggleDisable(section);
   }
@@ -272,5 +279,7 @@
     toggleEditMode('bank');
   });
 </script>
+
+<script src="{% static 'scripts/view_profile.js' %}"></script>
 
 {% endblock %}
