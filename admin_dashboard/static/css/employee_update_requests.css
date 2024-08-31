@@ -1,67 +1,183 @@
-/* Container styling */
+/* General container styles */
 .data-container {
-    margin: 0 auto;
 }
 
 .data-container h2 {
 }
 
-/* Request item styling */
-.requests-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+/* Filter section */
+.filter-section {
+    margin-bottom: 20px;
 }
 
+.filter-section label {
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+.filter-section .form-control {
+    display: inline-block;
+    width: auto;
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+/* Request item styles */
 .request-item {
-    padding: 15px;
     background-color: #fff;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .request-item h3 {
-    margin-bottom: 10px;
-    color: var(--secondary-color);
+    margin: 0px;
+    color: #292929;
 }
 
-.request-item p, .request-item ul {
-    margin-bottom: 10px;
+.request-item p {
     font-size: 14px;
-    color: #333;
+    margin-bottom: 8px;
+    color: #555;
 }
 
 .request-item ul {
-    list-style-type: disc;
+    margin-top: 10px;
+    margin-bottom: 10px;
     padding-left: 20px;
 }
 
 .request-item ul li {
-    margin-bottom: 5px;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 6px;
 }
 
+.request-item ul li input[type="text"] {
+    width: 20%;
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+/* Button styles */
 .btn {
-    padding: 10px 15px;
-    border-radius: 5px;
+    display: inline-block;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    border-radius: 4px;
+    cursor: pointer;
     text-decoration: none;
     color: #fff;
     margin-right: 10px;
-    font-size: 14px;
 }
 
 .approve-btn {
-    background-color: var(--primary-color);
-}
-
-.approve-btn:hover {
-    background-color: darken(var(--primary-color), 10%);
+    background-color: #28a745;
+    border: 1px solid #28a745;
 }
 
 .reject-btn {
-    background-color: #e74c3c;
+    background-color: #dc3545;
+    border: 1px solid #dc3545;
 }
 
-.reject-btn:hover {
-    background-color: darken(#e74c3c, 10%);
+.edit-approve-btn {
+    background-color: #ffc107;
+    border: 1px solid #ffc107;
+    color: #212529;
+}
+
+.details-btn {
+    background-color: #17a2b8;
+    border: 1px solid #17a2b8;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+/* Modal styles */
+#edit-approve-modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 500px;
+    max-width: 90%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.close-modal {
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+    color: #000;
+}
+
+.modal-content h3 {
+    font-size: 22px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.modal-content .form-group {
+    margin-bottom: 15px;
+}
+
+.modal-content .form-group label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.modal-content .form-group input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.modal-approve-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    border: 1px solid #28a745;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.modal-approve-btn:hover {
+    opacity: 0.9;
 }

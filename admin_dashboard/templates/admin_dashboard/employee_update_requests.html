@@ -10,34 +10,201 @@
 {% block content %}
 <div class="data-container">
     <h2>Employee Data Update Requests</h2>
-    {% if update_requests.exists %}
-        <div class="requests-list">
-            {% for request in update_requests %}
-                <div class="request-item">
-                    <h3>Request ID: {{ request.request_id }}</h3>
-                    <p><strong>Employee Name:</strong> {{ request.employee_id.first_name }} {{ request.employee_id.last_name }}</p>
-                    <p><strong>Department:</strong> {{ request.employee_id.department.name }}</p>
-                    <p><strong>Designation:</strong> {{ request.employee_id.designation.designation_name }}</p>
-                    <p><strong>Requested Changes:</strong></p>
-                    <ul>
-                        <li><strong>Email:</strong> {{ request.email }}</li>
-                        <li><strong>Phone Number:</strong> {{ request.phone_number }}</li>
-                        <li><strong>Address:</strong> {{ request.address }}</li>
-                        <li><strong>Emergency Contact Name:</strong> {{ request.emergency_contact_name }}</li>
-                        <li><strong>Emergency Contact Number:</strong> {{ request.emergency_contact_number }}</li>
-                        <li><strong>Bank Name:</strong> {{ request.bank_name }}</li>
-                        <li><strong>Bank Account Number:</strong> {{ request.bank_account_number }}</li>
-                        <li><strong>IFSC Code:</strong> {{ request.ifsc_code }}</li>
-                        <li><strong>Experience Description:</strong> {{ request.experience_description }}</li>
-                    </ul>
-                    <p><strong>Submitted At:</strong> {{ request.created_at }}</p>
-                    <a href="{% url 'admin_dashboard:approve_update_request' request.request_id %}" class="btn approve-btn">Approve</a>
-                    <a href="{% url 'admin_dashboard:reject_update_request' request.request_id %}" class="btn reject-btn">Reject</a>
-                </div>
-            {% endfor %}
+
+    <div class="filter-section">
+        <label for="update-type-select">Select Update Type:</label>
+        <select id="update-type-select" class="form-control">
+            <option value="personal">Personal Data Updates</option>
+            <option value="bank">Bank Details Updates</option>
+            <option value="document">Document Updates</option>
+        </select>
+        <div class="search-box">
+            <input type="text" id="search-box" class="form-control" placeholder="Search by Employee Name or ID">
         </div>
-    {% else %}
+    </div>
+
+    <div id="requests-container">
+        {% for request in update_requests %}
+        <div class="request-item" data-update-type="{% if request.profile_edit %}personal{% elif request.bank_edit %}bank{% else %}document{% endif %}" data-employee-name="{{ request.employee_id.first_name }} {{ request.employee_id.last_name }}" data-employee-id="{{ request.employee_id.employee_id }}">
+            <h3>{{ request.employee_id.first_name }} {{ request.employee_id.last_name }} ({{ request.employee_id.employee_id }})</h3>
+            <p><strong>Department:</strong> {{ request.employee_id.department.department_name }}</p>
+            <p><strong>Designation:</strong> {{ request.employee_id.designation.designation_name }}</p>
+            <p><strong>Requested Changes:</strong></p>
+
+            {% if request.profile_edit %}
+            <ul>
+                {% if request.email != request.employee_id.email %}
+                <li>
+                    <strong>Email:</strong> 
+                    <input type="text" name="email" value="{{ request.email }}" data-original-value="{{ request.employee_id.email }}">
+                    <span>(Original: {{ request.employee_id.email }})</span>
+                </li>
+                {% endif %}
+                {% if request.phone_number != request.employee_id.phone_number %}
+                <li>
+                    <strong>Phone Number:</strong> 
+                    <input type="text" name="phone_number" value="{{ request.phone_number }}" data-original-value="{{ request.employee_id.phone_number }}">
+                    <span>(Original: {{ request.employee_id.phone_number }})</span>
+                </li>
+                {% endif %}
+                {% if request.address != request.employee_id.address %}
+                <li>
+                    <strong>Address:</strong> 
+                    <input type="text" name="address" value="{{ request.address }}" data-original-value="{{ request.employee_id.address }}">
+                    <span>(Original: {{ request.employee_id.address }})</span>
+                </li>
+                {% endif %}
+                {% if request.emergency_contact_name != request.employee_id.emergency_contact_name %}
+                <li>
+                    <strong>Emergency Contact Name:</strong> 
+                    <input type="text" name="emergency_contact_name" value="{{ request.emergency_contact_name }}" data-original-value="{{ request.employee_id.emergency_contact_name }}">
+                    <span>(Original: {{ request.employee_id.emergency_contact_name }})</span>
+                </li>
+                {% endif %}
+                {% if request.emergency_contact_number != request.employee_id.emergency_contact_number %}
+                <li>
+                    <strong>Emergency Contact Number:</strong> 
+                    <input type="text" name="emergency_contact_number" value="{{ request.emergency_contact_number }}" data-original-value="{{ request.employee_id.emergency_contact_number }}">
+                    <span>(Original: {{ request.employee_id.emergency_contact_number }})</span>
+                </li>
+                {% endif %}
+                {% if request.emergency_contact_relationship != request.employee_id.emergency_contact_relationship %}
+                <li>
+                    <strong>Emergency Contact Relationship:</strong> 
+                    <input type="text" name="emergency_contact_relationship" value="{{ request.emergency_contact_relationship }}" data-original-value="{{ request.employee_id.emergency_contact_relationship }}">
+                    <span>(Original: {{ request.employee_id.emergency_contact_relationship }})</span>
+                </li>
+                {% endif %}
+            </ul>
+            {% elif request.bank_edit %}
+            <ul>
+                {% if request.bank_name != request.employee_id.bank_name %}
+                <li>
+                    <strong>Bank Name:</strong> 
+                    <input type="text" name="bank_name" value="{{ request.bank_name }}" data-original-value="{{ request.employee_id.bank_name }}">
+                    <span>(Original: {{ request.employee_id.bank_name }})</span>
+                </li>
+                {% endif %}
+                {% if request.bank_account_number != request.employee_id.bank_account_number %}
+                <li>
+                    <strong>Account Number:</strong> 
+                    <input type="text" name="bank_account_number" value="{{ request.bank_account_number }}" data-original-value="{{ request.employee_id.bank_account_number }}">
+                    <span>(Original: {{ request.employee_id.bank_account_number }})</span>
+                </li>
+                {% endif %}
+                {% if request.ifsc_code != request.employee_id.ifsc_code %}
+                <li>
+                    <strong>IFSC Code:</strong> 
+                    <input type="text" name="ifsc_code" value="{{ request.ifsc_code }}" data-original-value="{{ request.employee_id.ifsc_code }}">
+                    <span>(Original: {{ request.employee_id.ifsc_code }})</span>
+                </li>
+                {% endif %}
+                {% if request.bank_branch != request.employee_id.bank_branch %}
+                <li>
+                    <strong>Bank Branch:</strong> 
+                    <input type="text" name="bank_branch" value="{{ request.bank_branch }}" data-original-value="{{ request.employee_id.bank_branch }}">
+                    <span>(Original: {{ request.employee_id.bank_branch }})</span>
+                </li>
+                {% endif %}
+            </ul>
+            {% else %}
+            <ul>
+                {% for document in request.employee_id.documents.all %}
+                <li><strong>Document Type:</strong> {{ document.document_type }} - 
+                <a href="{{ document.document_path }}">View Document</a></li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            <p><strong>Submitted At:</strong> {{ request.created_at }}</p>
+            <a href="{% url 'admin_dashboard:employee_details' request.employee_id.employee_id %}" class="btn details-btn">View Employee Details</a>
+            <a href="{% url 'admin_dashboard:approve_update_request' request.request_id %}" class="btn approve-btn">Approve</a>
+            <a href="#" class="btn edit-approve-btn" onclick="showEditModal('{{ request.request_id }}')">Edit and Approve</a>
+            <a href="{% url 'admin_dashboard:reject_update_request' request.request_id %}" class="btn reject-btn">Reject</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not update_requests %}
         <p>No update requests found.</p>
     {% endif %}
 </div>
+
+<!-- Modal for editing and approving -->
+<div id="edit-approve-modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeEditModal()">&times;</span>
+        <h3>Edit and Approve Request</h3>
+        <form id="edit-approve-form" method="post" action="{% url 'admin_dashboard:edit_and_approve_update_request' %}">
+            {% csrf_token %}
+            <input type="hidden" name="request_id" id="modal-request-id">
+            <!-- Editable fields will be dynamically loaded here -->
+            <div id="modal-edit-fields"></div>
+            <button type="submit" class="btn modal-approve-btn">Approve Changes</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectElement = document.getElementById('update-type-select');
+        const searchBox = document.getElementById('search-box');
+        const requestsContainer = document.getElementById('requests-container');
+        const modal = document.getElementById('edit-approve-modal');
+        const modalEditFields = document.getElementById('modal-edit-fields');
+        const modalRequestId = document.getElementById('modal-request-id');
+
+        function filterRequests() {
+            const selectedType = selectElement.value.toLowerCase();
+            const searchTerm = searchBox.value.toLowerCase();
+            const requestItems = requestsContainer.querySelectorAll('.request-item');
+
+            requestItems.forEach(item => {
+                const updateType = item.getAttribute('data-update-type');
+                const employeeName = item.getAttribute('data-employee-name').toLowerCase();
+                const employeeId = item.getAttribute('data-employee-id').toLowerCase();
+
+                const matchesSearch = employeeName.includes(searchTerm) || employeeId.includes(searchTerm);
+                const matchesType = updateType === selectedType || (selectedType === 'document' && !item.dataset.updateType);
+
+                if (matchesSearch && matchesType) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function showEditModal(requestId) {
+            const requestItem = document.querySelector(`.request-item[data-request-id="${requestId}"]`);
+            const inputs = requestItem.querySelectorAll('input');
+
+            modalEditFields.innerHTML = ''; // Clear previous fields
+
+            inputs.forEach(input => {
+                const originalValue = input.getAttribute('data-original-value');
+                const name = input.getAttribute('name');
+                const label = input.previousSibling.textContent.trim();
+                
+                modalEditFields.innerHTML += `
+                    <div class="form-group">
+                        <label for="${name}">${label} (Original: ${originalValue})</label>
+                        <input type="text" id="${name}" name="${name}" value="${input.value}">
+                    </div>
+                `;
+            });
+
+            modalRequestId.value = requestId;
+            modal.style.display = 'block';
+        }
+
+        function closeEditModal() {
+            modal.style.display = 'none';
+        }
+
+        selectElement.addEventListener('change', filterRequests);
+        searchBox.addEventListener('input', filterRequests);
+        filterRequests(); // Initialize filtering based on the default selection and any existing search term
+    });
+</script>
+
 {% endblock %}
