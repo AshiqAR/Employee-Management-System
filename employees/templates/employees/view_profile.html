@@ -39,19 +39,18 @@
     {% endif %}
     <form class="grid-container" method="POST" action="{% url 'employees:update_personal_details' %}">
       {% csrf_token %}
-      {% for field in personal_form %}
-      <div class="form-group">
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {% if field.errors %}
-        <ul class="errorlist">
+      {{ personal_form.as_p }}
+      {% if personal_form.errors %}
+      <div class="form-group error-messages">
+        <ul>
+          {% for field in personal_form %}
           {% for error in field.errors %}
           <li>{{ error }}</li>
           {% endfor %}
+          {% endfor %}
         </ul>
-        {% endif %}
       </div>
-      {% endfor %}
+      {% endif %}
       <div class="button-group" id="personal-submit-cancel-button-div">
         <button type="submit" class="edit-button" id="submit-personal">Submit</button>
         <button type="button" class="cancel-button" id="cancel-personal">Cancel</button>
@@ -82,19 +81,18 @@
     {% endif %}
     <form class="grid-container" method="POST" action="{% url 'employees:update_bank_details' %}">
       {% csrf_token %}
-      {% for field in bank_form %}
-      <div class="form-group">
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {% if field.errors %}
-        <ul class="errorlist">
+      {{ bank_form.as_p }}
+      {% if bank_form.errors %}
+      <div class="form-group error-messages">
+        <ul>
+          {% for field in bank_form %}
           {% for error in field.errors %}
           <li>{{ error }}</li>
           {% endfor %}
+          {% endfor %}
         </ul>
-        {% endif %}
       </div>
-      {% endfor %}
+      {% endif %}
       <div class="button-group" id="bank-submit-cancel-button-div">
         <button type="submit" class="edit-button" id="submit-bank">Submit</button>
         <button type="button" class="cancel-button" id="cancel-bank">Cancel</button>
@@ -139,8 +137,7 @@
       {% endif %}
     </div>
     
-
-    <form class="upload-document-form" method="POST" action="{% url 'employees:upload_document' %}" enctype="multipart/form-data">
+    <form class="upload-document-form grid-container" method="POST" action="{% url 'employees:upload_document' %}" enctype="multipart/form-data">
       <h4>Upload New Document</h4>
       {% csrf_token %}
       {{ document_form.as_p }}
@@ -155,10 +152,11 @@
         </ul>
       </div>
       {% endif %}
-      <button type="submit" class="edit-button">Submit</button>
+      <button type="submit" class="edit-button doc-submit">Submit</button>
     </form>
   </div>
 </div>
+
 
 <script>
   let personalFormInitialValues = {};

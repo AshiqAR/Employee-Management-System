@@ -1,127 +1,209 @@
+/* General container styling */
 .profile-container {
-  margin: 0 auto;
+  margin: 10px auto;
 }
 
+/* Section styling */
 .section {
-  margin: 15px 0;
-  padding: 20px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  background-color: #f9f9f9;
-}
-
-.section h3 {
-  margin-bottom: 20px;
-}
-
-.grid-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group label {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.form-group input {
+  background-color: #fff;
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.update-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  display: block;
-}
-
-.update-button:hover {
-  background-color: #45a049;
-}
-
-.documents-list ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.documents-list li {
   margin-bottom: 10px;
 }
 
-.documents-list a {
-  color: #007BFF;
-  text-decoration: none;
+.section h3 {
+  margin-top: 0;
+  color: #333;
 }
 
-.documents-list a:hover {
-  text-decoration: underline;
+/* Personal Details and Bank Details specific styling */
+.personal-details p,
+.bank-details p, 
+.upload-document-form p {
+  color: #424242;
+  display: flex;
+  flex-direction: column;
+  margin: 10px 10px;
 }
 
-.button-group {
-  grid-column: span 2;
-}
-
-.button-group button{
-  color: white;
-  padding: 10px 20px;
+.personal-details p input,
+.bank-details p input, 
+.upload-document-form p input {
+  background-color: rgba(174, 174, 174, 0.082);
+  color: #333;
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  margin-right: 10px;
+  border-radius: 4px;
+  padding: 10px;
+  margin-top: 5px;
+  font-size: 15px;
 }
 
-.edit-button {
-  background-color: #ffc107;
+.personal-details p input:focus,
+.bank-details p input:focus,
+.upload-document-form p input:focus {
+  outline: 1px solid #004691aa; /* Blue outline for focus state */
 }
 
-.edit-button:hover {
-  background-color: #d39e00;
-} 
-
-.cancel-button {
-  background-color: #dc3545;
+.personal-details p label,
+.bank-details p label, 
+.upload-document-form p label {
+  font-weight: bold;
 }
-
-.cancel-button:hover {
-  background-color: #bd2130;
-}
-
-  .documents-list table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    font-size: 1em;
-    text-align: left;
-  }
-
-  .documents-list th, .documents-list td {
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-  }
-
-  .documents-list th {
-    background-color: #f4f4f4;
-  }
-
-  .documents-list tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-
 
 .upload-document-form {
 }
 
+
+.upload-document-form p{
+
+}
+
+/* Document Section styling */
+.documents-list {
+}
+
+.documents-list table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.documents-list th,
+.documents-list td {
+  border: 1px solid #ddd;
+  text-align: left;
+  padding: 8px;
+}
+
+.documents-list th {
+  background-color: #f4f4f4;
+}
+
+.documents-list .verified {
+  color: #28a745; /* Green color for verified */
+}
+
+.documents-list .unverified {
+  color: #dc3545; /* Red color for unverified */
+}
+
+/* Form container */
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Form elements */
+.grid-container input,
+.grid-container select,
+.grid-container textarea {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.grid-container label {
+  font-weight: bold;
+}
+
+/* Error messages */
+.error-messages {
+  background-color: #fdd;
+  border: 1px solid #f99;
+  border-radius: 4px;
+}
+
+.error-messages ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.error-messages li {
+  color: #d44;
+}
+
+/* Button Group */
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.edit-button,
+.cancel-button {
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  padding: 10px 20px;
+  margin: 10px 5px;
+}
+
+.edit-button {
+  background-color: #28a745; /* Green color for submit button */
+}
+
+.cancel-button {
+  background-color: #6c757d; /* Gray color for cancel button */
+}
+
+.edit-button:hover,
+.cancel-button:hover {
+  opacity: 0.9;
+}
+
+.edit-button:focus,
+.cancel-button:focus {
+  outline: 2px solid #007bff; /* Blue outline for focus state */
+  outline-offset: 2px;
+}
+
+.update-button {
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  background-color: #28a745; /* Blue color for update button */
+  cursor: pointer;
+  padding: 10px 20px;
+  margin: 10px 5px;
+}
+
+.update-button:hover {
+  opacity: 0.9;
+}
+
+.upload-document-form textarea {
+  height: 40px;
+  background-color: rgba(174, 174, 174, 0.082);
+}
+
+.upload-document-form h4 {
+  margin-top: 0;
+  color: #333;
+  grid-column: span 2;
+}
+
+.doc-submit{
+  grid-column: span 2;
+  border: none;
+  width: 40%;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .grid-container {
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .button-group button {
+  }
+}

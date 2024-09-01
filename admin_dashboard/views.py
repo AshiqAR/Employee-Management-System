@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import logout, update_session_auth_hash
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
+from django.db import IntegrityError
 
 from employees.models import Designation, Employee, Document, EmployeeUpdate, Department
 from attendance.models import Attendance
@@ -295,28 +296,35 @@ def handle_employee_update_request(request, request_id):
     if action == 'approve':
         # Apply the requested changes to the employee profile
         if update_request.profile_edit:
-            employee.email = request.POST.get('email', employee.email)
-            employee.phone_number = request.POST.get('phone_number', employee.phone_number)
-            employee.address = request.POST.get('address', employee.address)
-            employee.emergency_contact_name = request.POST.get('emergency_contact_name', employee.emergency_contact_name)
-            employee.emergency_contact_number = request.POST.get('emergency_contact_number', employee.emergency_contact_number)
-            employee.emergency_contact_relationship = request.POST.get('emergency_contact_relationship', employee.emergency_contact_relationship)
-            employee.experience_description = request.POST.get('experience_description', employee.experience_description)
+            employee.email = update_request.email or employee.email
+            employee.phone_number = update_request.phone_number or employee.phone_number
+            employee.address = update_request.address or employee.address
+            employee.emergency_contact_name = update_request.emergency_contact_name or employee.emergency_contact_name
+            employee.emergency_contact_number = update_request.emergency_contact_number or employee.emergency_contact_number
+            employee.emergency_contact_relationship = update_request.emergency_contact_relationship or employee.emergency_contact_relationship
+            employee.experience_description = update_request.experience_description or employee.experience_description
             employee.has_profile_edit = False
 
         if update_request.bank_edit:
-            employee.bank_name = request.POST.get('bank_name', employee.bank_name)
-            employee.bank_account_number = request.POST.get('bank_account_number', employee.bank_account_number)
-            employee.ifsc_code = request.POST.get('ifsc_code', employee.ifsc_code)
-            employee.bank_branch = request.POST.get('bank_branch', employee.bank_branch)
+            employee.bank_name = update_request.bank_name or employee.bank_name
+            employee.bank_account_number = update_request.bank_account_number or employee.bank_account_number
+            employee.ifsc_code = update_request.ifsc_code or employee.ifsc_code
+            employee.bank_branch = update_request.bank_branch or employee.bank_branch
             employee.has_bank_account_edit = False
 
-        # Save the employee with the new changes
-        employee.save()
-        
-        # Provide a success message
-        messages.success(request, 'Update request has been approved successfully.')
+        try:
+            employee.save()
+            messages.success(request, 'Update request has been approved successfully.')
 
+        except IntegrityError as e:
+            messages.error(request, f'An error occurred while saving the employee profile: {e}')
+            return redirect('admin_dashboard:employee_update_requests')
+        
+        except Exception as e:
+            print(e)
+            messages.error(request, 'An error occurred while saving the employee profile.')
+            return redirect('admin_dashboard:employee_update_requests')
+        
     elif action == 'reject':
         # Revert the flags in employee profile if the request is rejected
         if update_request.profile_edit:
@@ -326,16 +334,24 @@ def handle_employee_update_request(request, request_id):
             employee.has_bank_account_edit = False
 
         # Save the employee profile with reverted changes
-        employee.save()
-
-        # Provide a rejection message
-        messages.success(request, 'Update request has been rejected.')
+        try:
+            employee.save()
+            messages.success(request, 'Update request has been rejected.')
+        except IntegrityError as e:
+            messages.error(request, f'An error occurred while saving the employee profile: {e}')
+            return redirect('admin_dashboard:employee_update_requests')
+        
+        except Exception as e:
+            print(e)
+            messages.error(request, 'An error occurred while saving the employee profile.')
+            return redirect('admin_dashboard:employee_update_requests')
 
     # Delete the update request after either approving or rejecting
     update_request.delete()
 
     # Redirect back to the manage update requests page
     return redirect('admin_dashboard:employee_update_requests')
+
 
 @group_required('hr')
 def search_supervisor(request):

@@ -1,10 +1,12 @@
 from django import forms
 from .models import EmployeeUpdate, Document
 
+
 class PersonalDetailsForm(forms.ModelForm):
     class Meta:
         model = EmployeeUpdate
         fields = [
+            'profile_edit','employee_id', 
             'email', 'phone_number', 'address', 'emergency_contact_name',
             'emergency_contact_number', 'emergency_contact_relationship'
         ]
@@ -16,7 +18,28 @@ class PersonalDetailsForm(forms.ModelForm):
             'emergency_contact_number': 'Emergency Contact Number',
             'emergency_contact_relationship': 'Emergency Contact Relationship'
         }
+        widgets = {
+            'employee_id': forms.HiddenInput(),
+            'profile_edit': forms.HiddenInput()
+        }
 
+    def __init__(self, *args, **kwargs):
+        employee_id = kwargs.pop('employee_id', None)
+        profile_edit = kwargs.pop('profile_edit', False)
+        super(PersonalDetailsForm, self).__init__(*args, **kwargs)
+        
+        if employee_id is not None:
+            self.fields['employee_id'].initial = employee_id
+
+        self.fields['profile_edit'].initial = False
+
+    def save(self, commit=True):
+        instance = super(PersonalDetailsForm, self).save(commit=False)
+        instance.profile_edit = False
+        if commit:
+            instance.save()
+        return instance
+    
 class BankDetailsForm(forms.ModelForm):
     class Meta:
         model = EmployeeUpdate

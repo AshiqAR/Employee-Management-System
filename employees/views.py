@@ -36,14 +36,34 @@ def get_employee_profile_context(user):
     
     updated_employee_personal = EmployeeUpdate.objects.filter(employee_id=employee, profile_edit=True).last()
     updated_employee_bank = EmployeeUpdate.objects.filter(employee_id=employee, bank_edit=True).last()
+
+    personal_form = PersonalDetailsForm(
+        initial={
+            'employee_id': employee.employee_id,
+            'profile_edit': False,
+            'email': employee.email,
+            'phone_number': employee.phone_number,
+            'address': employee.address,
+            'emergency_contact_name': employee.emergency_contact_name,
+            'emergency_contact_number': employee.emergency_contact_number,
+            'emergency_contact_relationship': employee.emergency_contact_relationship
+        }
+    )
+    
+    bank_form = BankDetailsForm(initial={
+        'bank_name': employee.bank_name,
+        'bank_account_number': employee.bank_account_number,
+        'ifsc_code': employee.ifsc_code,
+        'bank_branch': employee.bank_branch
+    })
     
     context = {
         'employee': employee,
         'documents': employee_docs,
         'updated_employee_personal': updated_employee_personal,
         'updated_employee_bank': updated_employee_bank,
-        'personal_form': PersonalDetailsForm(instance=employee),
-        'bank_form': BankDetailsForm(instance=employee),
+        'personal_form': personal_form,
+        'bank_form': bank_form,
         'document_form': DocumentForm(employee_id=employee.employee_id, validated=False),
     }
     
@@ -145,57 +165,69 @@ def view_profile_view(request):
 
 @group_required('employee')
 def update_personal_details(request):
+    # Fetch the employee associated with the current user
     employee = get_object_or_404(Employee, user_account=request.user)
-    clear_messages(request)
+    clear_messages(request)  # Clear any existing messages
 
     if request.method == 'POST':
+        # Check if the employee already has a pending profile edit
         if employee.has_profile_edit:
             messages.error(request, 'You already have a pending request to update your personal details.')
             return redirect('employees:view_profile')
         
+        # Bind the form to the POST data
         form = PersonalDetailsForm(request.POST)
+
         if form.is_valid():
+            # Check for changes between the form data and the current employee data
             update_fields = {}
             for field in form.cleaned_data:
                 new_value = form.cleaned_data[field]
-                old_value = employee.__dict__[field]
-                if new_value != old_value and new_value is not None:
-                    update_fields[field] = new_value
-
+                if hasattr(employee, field):
+                    old_value = getattr(employee, field)
+                    if new_value != old_value and new_value is not None:
+                        update_fields[field] = new_value
+                        
             print("Form is valid. Update fields:", update_fields)
 
             if update_fields:
                 try:
-                    print("Creating EmployeeUpdate with fields:", update_fields)
-                    EmployeeUpdate.objects.create(
-                        employee_id=employee,
-                        email=update_fields.get('email', employee.email),
-                        phone_number=update_fields.get('phone_number', employee.phone_number),
-                        address=update_fields.get('address', employee.address),
-                        emergency_contact_name=update_fields.get('emergency_contact_name', employee.emergency_contact_name),
-                        emergency_contact_number=update_fields.get('emergency_contact_number', employee.emergency_contact_number),
-                        emergency_contact_relationship=update_fields.get('emergency_contact_relationship', employee.emergency_contact_relationship),
-                        profile_edit=True
-                    )
+                    # Create a new EmployeeUpdate object with the changed fields
+                    employee_update = form.save(commit=False)
+                    employee_update.employee_id = employee
+                    employee_update.profile_edit = True
+                    employee_update.save()
+
+                    # Mark the employee as having a pending profile edit
                     employee.has_profile_edit = True
                     employee.save()
                     print("EmployeeUpdate created successfully.")
+                    
+                    messages.success(request, 'Your personal details update has been saved and will be reflected after validation.')
                 except Exception as e:
                     print("Error creating EmployeeUpdate:", e)
+                    messages.error(request, 'There was an error saving your details. Please try again.')
 
-                messages.success(request, 'Your personal details update has been saved and will be reflected after validation.')
             else:
                 messages.info(request, 'No changes detected in your personal details.')
 
             return redirect('employees:view_profile')
         else:
+            # Handle form errors
             print("Form is invalid. Errors:", form.errors)
             messages.error(request, 'Please correct the errors below.')
 
-    context = get_employee_profile_context(request.user)
-    context['personal_form'] = form
+    else:
+        # If the request method is GET, create a form pre-filled with the employee's current details
+        form = PersonalDetailsForm(instance=employee)
 
+    # Prepare the context for rendering the profile view
+    context = get_employee_profile_context(request.user)
+    context['personal_form'] = form  # Pass the form to the context
+
+    # Render the profile view with the provided context
     return render(request, 'employees/view_profile.html', context)
+
 
 
 @group_required('employee')
