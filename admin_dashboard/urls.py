@@ -17,7 +17,5 @@ urlpatterns = [
     path('employee_details/<int:employee_id>/', views.employee_details, name='employee_details'),
     path('employee_update_requests/', views.employee_update_requests, name='employee_update_requests'),
 
-    path('approve-update-request/<int:request_id>/', views.approve_update_request, name='approve_update_request'),
-    path('reject-update-request/<int:request_id>/', views.reject_update_request, name='reject_update_request'),
-    path('edit-and-approve-update-request/', views.edit_and_approve_update_request, name='edit_and_approve_update_request'),
+    path('handle_employee_update_request/<int:request_id>/', views.handle_employee_update_request, name='handle_employee_update_request'),
 ]

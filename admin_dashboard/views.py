@@ -158,84 +158,53 @@ def employee_update_requests(request):
     return render(request, 'admin_dashboard/employee_update_requests.html', {'update_requests': update_requests})
 
 @group_required('hr')
-def approve_update_request(request, request_id):
+def handle_employee_update_request(request, request_id):
     update_request = get_object_or_404(EmployeeUpdate, request_id=request_id)
-    
-    # Apply the requested changes to the employee profile
-    if update_request.profile_edit:
-        employee = update_request.employee_id
-        employee.email = update_request.email
-        employee.phone_number = update_request.phone_number
-        employee.address = update_request.address
-        employee.emergency_contact_name = update_request.emergency_contact_name
-        employee.emergency_contact_number = update_request.emergency_contact_number
-        employee.experience_description = update_request.experience_description
-        employee.has_profile_edit = False
-        employee.save()
-        
-    if update_request.bank_edit:
-        employee = update_request.employee_id
-        employee.bank_name = update_request.bank_name
-        employee.bank_account_number = update_request.bank_account_number
-        employee.ifsc_code = update_request.ifsc_code
-        employee.bank_branch = update_request.bank_branch
-        employee.has_bank_account_edit = False
-        employee.save()
+    employee = update_request.employee_id
 
-    # Delete the request after approving
-    update_request.delete()
-    messages.success(request, 'Update request has been approved successfully.')
-    return redirect('admin_dashboard:manage_update_requests')
+    # Determine if the request is to approve or reject
+    action = request.POST.get('action')
 
-# View to reject an update request
-def reject_update_request(request, request_id):
-    update_request = get_object_or_404(EmployeeUpdate, request_id=request_id)
-
-    # Revert the flags in employee profile if the request is rejected
-    if update_request.profile_edit:
-        employee = update_request.employee_id
-        employee.has_profile_edit = False
-        employee.save()
-    
-    if update_request.bank_edit:
-        employee = update_request.employee_id
-        employee.has_bank_account_edit = False
-        employee.save()
-
-    # Delete the request after rejecting
-    update_request.delete()
-    messages.success(request, 'Update request has been rejected.')
-    return redirect('admin_dashboard:manage_update_requests')
-
-def edit_and_approve_update_request(request):
-    if request.method == 'POST':
-        request_id = request.POST.get('request_id')
-        update_request = get_object_or_404(EmployeeUpdate, request_id=request_id)
-
-        # Apply the updated changes based on the form inputs
+    if action == 'approve':
+        # Apply the requested changes to the employee profile
         if update_request.profile_edit:
-            employee = update_request.employee_id
             employee.email = request.POST.get('email', employee.email)
             employee.phone_number = request.POST.get('phone_number', employee.phone_number)
             employee.address = request.POST.get('address', employee.address)
             employee.emergency_contact_name = request.POST.get('emergency_contact_name', employee.emergency_contact_name)
             employee.emergency_contact_number = request.POST.get('emergency_contact_number', employee.emergency_contact_number)
-            employee.emergency_contact_relationship = request.POST.get('emergency_contact_relationship', employee.emergency_contact_relationship)
+            employee.experience_description = request.POST.get('experience_description', employee.experience_description)
             employee.has_profile_edit = False
-            employee.save()
 
         if update_request.bank_edit:
-            employee = update_request.employee_id
             employee.bank_name = request.POST.get('bank_name', employee.bank_name)
             employee.bank_account_number = request.POST.get('bank_account_number', employee.bank_account_number)
             employee.ifsc_code = request.POST.get('ifsc_code', employee.ifsc_code)
             employee.bank_branch = request.POST.get('bank_branch', employee.bank_branch)
             employee.has_bank_account_edit = False
-            employee.save()
 
-        # Delete the request after approving
-        update_request.delete()
+        # Save the employee with the new changes
+        employee.save()
+        
+        # Provide a success message
         messages.success(request, 'Update request has been approved successfully.')
-        return redirect('admin_dashboard:manage_update_requests')
 
-    return redirect('admin_dashboard:manage_update_requests')
+    elif action == 'reject':
+        # Revert the flags in employee profile if the request is rejected
+        if update_request.profile_edit:
+            employee.has_profile_edit = False
+
+        if update_request.bank_edit:
+            employee.has_bank_account_edit = False
+
+        # Save the employee profile with reverted changes
+        employee.save()
+
+        # Provide a rejection message
+        messages.success(request, 'Update request has been rejected.')
+
+    # Delete the update request after either approving or rejecting
+    update_request.delete()
+
+    # Redirect back to the manage update requests page
+    return redirect('admin_dashboard:employee_update_requests')
