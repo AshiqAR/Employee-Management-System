@@ -72,11 +72,90 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 768px) {
-  .employee-form {
-    grid-template-columns: 1fr;
-  }
-  .submit-button {
-    grid-column: span 1;
-  }
+
+
+
+/* Supervisory Data Section Styles */
+.supervisor-search-group {
+  margin-top: 20px;
+  grid-column: span 2;
+}
+
+.supervisor-search-group label {
+  display: block;
+  font-weight: bold;
+  color: var(--secondary-color);
+  margin-bottom: 10px;
+}
+
+.search-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px; /* Space between input and button */
+  margin-bottom: 10px;
+}
+
+.search-controls input {
+  flex: 1;
+}
+
+#search_supervisor {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#search_supervisor:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  outline: none;
+}
+
+#search_button {
+  padding: 10px 15px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#search_button:hover {
+  background-color: var(--secondary-color);
+  transform: scale(1.03);
+}
+
+#search-results {
+  margin-top: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: white;
+}
+
+.search-item {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  transition: background-color 0.3s ease;
+}
+
+.search-item:hover {
+  background-color: #e0e0e0;
+}
+
+.search-item:last-child {
+  border-bottom: none;
+}
+
+.search-item span {
+  display: block;
+  font-size: 13px;
+  color: #666;
 }

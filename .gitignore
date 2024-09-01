@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 .prettierignore
 
+search_keyword_html.py
 # C extensions
 *.so
 

@@ -12,7 +12,13 @@ urlpatterns = [
     path('notifications/', views.notifications, name='notifications'),
     path('logout/', views.logout_view, name='logout'),
 
+    path('departments/', views.manage_departments_and_designations, name='manage_departments_and_designations'),
+    path('add_department/', views.add_department, name='add_department'),
+    path('add_designation/', views.add_designation, name='add_designation'),
+
     path('edit_employee/<int:employee_id>/', views.edit_employee, name='edit_employee'),
+    path('search_supervisor/', views.search_supervisor, name='search_supervisor'),
+    
     path('leave/review_leave_request/<uuid:leave_request_id>/', views.review_leave_request, name='review_leave_request'),
     path('employee_details/<int:employee_id>/', views.employee_details, name='employee_details'),
     path('employee_update_requests/', views.employee_update_requests, name='employee_update_requests'),

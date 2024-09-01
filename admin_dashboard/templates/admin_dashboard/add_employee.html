@@ -5,10 +5,12 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/add_employee.css' %}" />
+<link rel="stylesheet" href="{% static 'css/_message_popup.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="addemployee-container">
+    {% include '_message_popup.html' %}
     <h2>Add New Employee</h2>
     <form action="{% url 'admin_dashboard:add_employee' %}" method="POST" class="employee-form">
         {% csrf_token %}
@@ -61,7 +63,9 @@
         <div class="form-group">
             <label for="department_id">Department</label>
             <select id="department_id" name="department_id" required>
-                <!-- Options for departments -->
+                {% for department in departments %}
+                    <option value="{{ department.department_id }}">{{ department.department_name }}</option>
+                {% endfor %}
             </select>
         </div>
         
@@ -69,7 +73,7 @@
             <label for="designation_id">Designation</label>
             <select id="designation_id" name="designation_id" required>
                 {% for designation in designations %}
-                    <option value="{{ designation.id }}">{{ designation.designation_name }}</option>
+                    <option value="{{ designation.designation_id }}">{{ designation.designation_name }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -85,4 +89,5 @@
         <button type="submit" class="submit-button">Add Employee</button>
     </form>
 </div>
+<script src="{% static 'scripts/_message_popup.js' %}"></script>
 {% endblock %}

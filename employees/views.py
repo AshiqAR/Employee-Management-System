@@ -44,7 +44,7 @@ def get_employee_profile_context(user):
         'updated_employee_bank': updated_employee_bank,
         'personal_form': PersonalDetailsForm(instance=employee),
         'bank_form': BankDetailsForm(instance=employee),
-        'document_form': DocumentForm(),
+        'document_form': DocumentForm(employee_id=employee.employee_id, validated=False),
     }
     
     return context
@@ -53,9 +53,10 @@ def get_employee_profile_context(user):
 def index(request):
     user = get_object_or_404(User, username=request.user.username)
     employee = get_object_or_404(Employee, user_account=user)
-    if user.check_password(f'{employee.first_name.capitalize()}@{employee.employee_id}'):
+    context = {'employee': employee}
+    if user.check_password(f'{employee.first_name.lower()}@123'):
         return redirect('employees:change_password')
-    return render(request, 'employees/index.html')
+    return render(request, 'employees/index.html', context)
 
 @group_required('employee')
 def change_password(request):
@@ -241,22 +242,23 @@ def update_bank_details(request):
 
     return render(request, 'employees/view_profile.html', context)
 
-
 @group_required('employee')
-def add_document(request):
-    employee = get_object_or_404(Employee, user_account=request.user)
-
+def upload_document(request):
     if request.method == 'POST':
-        document_type = request.POST.get('document_type')
-        document_description = request.POST.get('document_description')
-        document_path = request.POST.get('document_path')
-        # Document.objects.create(employee_id=employee, document_type=document_type, document_description=document_description, document_path=document_path)
-        messages.success(request, 'Document added successfully.')
-        return redirect('employees:view_profile')
-    
-    return render(request, 'employees/add_document.html')
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Document uploaded successfully.')
+            form = DocumentForm(employee_id=request.user.employee, validated=False)
+        else:
+            messages.error(request, 'Please correct the errors below.')
 
+    else:
+        form = DocumentForm(employee_id=request.user.employee, validated=False)
 
+    context = get_employee_profile_context(request.user)
+    context['document_form'] = form
+    return render(request, 'employees/view_profile.html', context)
 
 @group_required('employee')
 def leave_application_view(request):

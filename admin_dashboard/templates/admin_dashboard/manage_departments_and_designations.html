@@ -1,0 +1,63 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Manage Departments and View Designations{% endblock %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static 'css/_message_popup.css' %}">
+  <link rel="stylesheet" href="{% static 'css/manage_departments_and_designations.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="manage-department-container">
+  {% include '_message_popup.html' %}
+  <h2>Manage Departments</h2>
+  <div class="department-container">
+    <div class="department-list">
+      <h3>Departments</h3>
+      <ul id="department-list">
+        {% for department in departments %}
+          <li>
+            <a href="#" class="department" data-department-id="{{ department.id }}">{{ department.department_name }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="department-form">
+      <form id="add-department-form" method="POST" action="{% url 'admin_dashboard:add_department' %}">
+        {% csrf_token %}
+        <input type="text" name="department_name" id="department" placeholder="Department Name" required>
+        <button type="submit">Add Department</button>
+      </form>
+    </div>
+  </div>
+
+  <hr>
+
+  <h2>Manage Designations</h2>
+  <div class="designation-container">
+    <div class="designation-list">
+      <h3>Designations</h3>
+      <ul id="designation-list">
+        {% for designation in designations %}
+          <li>
+            <span>{{ designation.designation_name }}</span> - {{ designation.responsibilities }}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="designation-form">
+      <form id="add-designation-form" method="POST" action="{% url 'admin_dashboard:add_designation' %}">
+        {% csrf_token %}
+        <input type="text" name="designation_name" id="designation" placeholder="Designation Name" required>
+        <input type="text" name="responsibilities" id="responsibilities" placeholder="Enter Designation responsibilities" required>
+        <button type="submit">Add Designation</button>
+      </form>
+    </div>
+</div>
+
+<!-- JavaScript for Modals and Functionality -->
+<script src="{% static 'scripts/manage_departmentsScript.js' %}"></script>
+<script src="{% static 'scripts/_message_popup.js' %}"></script>
+{% endblock %}

@@ -8,7 +8,33 @@
 {% endblock %}
 
 {% block content %}
-<h2>Employee Details</h2>
-<h2>Attendance Overview</h2>
 
+<div class="profile-container">
+    <h2>{{ employee.first_name }} {{ employee.last_name }}</h2>
+    <div class="profile-details">
+        <p><strong>Employee ID:</strong> {{ employee.employee_id }}</p>
+        <p><strong>Department:</strong> {{ employee.department.department_name }}</p>
+        <p><strong>Designation:</strong> {{ employee.designation.designation_name }}</p>
+    </div>
+
+    <div class="attendance-overview-container">
+        <h3>Attendance Overview</h3>
+        <div class="attendance-overview">
+            <div class="attendance-overview-item">
+                <p>Present</p>
+                <p>{{ employee.attendance.present }}</p>
+            </div>
+            <div class="attendance-overview-item">
+                <p>Absent</p>
+                <p>{{ employee.attendance.absent }}</p>
+            </div>
+            <div class="attendance-overview-item">
+                <p>On Leave</p>
+                <p>{{ employee.attendance.on_leave }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
 {% endblock %}

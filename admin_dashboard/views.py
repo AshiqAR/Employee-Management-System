@@ -2,13 +2,13 @@ from django.utils import timezone
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import logout, update_session_auth_hash
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 
-from employees.models import Designation, Employee, Document, EmployeeUpdate
+from employees.models import Designation, Employee, Document, EmployeeUpdate, Department
 from attendance.models import Attendance
 from leave.models import Leave, LeaveRequest
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 def validate_password(password):
     if len(password) < 8:
@@ -21,6 +21,11 @@ def validate_password(password):
         return False, 'Password must contain at least one lowercase letter.'
     return True, None
 
+def clear_messages(request):
+    storage = messages.get_messages(request)
+    for message in storage:
+        pass
+
 def group_required(group_name):
     def in_group(user):
         return user.is_authenticated and user.groups.filter(name=group_name).exists()
@@ -28,8 +33,92 @@ def group_required(group_name):
 
 @group_required('hr')
 def add_employee(request):
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        phone_number = request.POST.get('phone_number')
+        date_of_birth = request.POST.get('date_of_birth')
+        date_of_joining = request.POST.get('date_of_joining')
+        address = request.POST.get('address', 'No Address')
+        bank_name = request.POST.get('bank_name')
+        bank_account_number = request.POST.get('bank_account_number')
+        ifsc_code = request.POST.get('ifsc_code')
+        department_id = request.POST.get('department_id')
+        designation_id = request.POST.get('designation_id')
+        role = request.POST.get('role')
+        supervisor_id = request.POST.get('supervisor_id')
+
+        # Fetch related objects
+        try:
+            department = Department.objects.get(department_id=department_id)
+            print('department found')
+            designation = Designation.objects.get(designation_id=designation_id)
+            print('designation found')
+        except Department.DoesNotExist:
+            messages.error(request, "Invalid department selected.")
+            return redirect('admin_dashboard:add_employee')
+        except Designation.DoesNotExist:
+            messages.error(request, "Invalid designation selected.")
+            return redirect('admin_dashboard:add_employee')
+
+        supervisor = None
+        if supervisor_id:
+            print('supervisor_id:', supervisor_id)
+            try:
+                supervisor = Employee.objects.get(employee_id=supervisor_id)
+            except Employee.DoesNotExist:
+                messages.error(request, "Invalid supervisor selected.")
+                return redirect('admin_dashboard:add_employee')
+
+        # Create the user account
+        try:
+            user_account = User.objects.create_user(
+                username=email,
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                password=f"{first_name.lower()}@123",
+                is_staff=True if role == 'hr' else False
+            )
+            group = Group.objects.get(name=role)
+            user_account.groups.add(group)
+
+        except Exception as e:
+            messages.error(request, f"same username or password exists")
+            return redirect('admin_dashboard:add_employee')
+        
+        # Create the employee
+        employee = Employee.objects.create(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            phone_number=phone_number,
+            date_of_birth=date_of_birth,
+            date_of_joining=date_of_joining,
+            address=address,
+            bank_name=bank_name,
+            bank_account_number=bank_account_number,
+            ifsc_code=ifsc_code,
+            department=department,
+            designation=designation,
+            role=role,
+            supervisor=supervisor,
+            user_account=user_account
+        )
+
+        messages.success(request, f"Employee {employee.first_name} {employee.last_name} added successfully.")
+        return redirect('admin_dashboard:index')
+
+    # Handle GET request
     designations = Designation.objects.all()
-    return render(request, 'admin_dashboard/add_employee.html', {'designations': designations})
+    departments = Department.objects.all()
+    context = {
+        'designations': designations,
+        'departments': departments,
+    }
+
+    return render(request, 'admin_dashboard/add_employee.html', context)
 
 @group_required('hr')
 def index(request):
@@ -84,9 +173,47 @@ def logout_view(request):
 
 @group_required('hr')
 def edit_employee(request, employee_id):
-    employee = Employee.objects.get(employee_id=employee_id)
+    employee = get_object_or_404(Employee, employee_id=employee_id)
+    clear_messages(request)
+    if request.method == 'POST':
+        employee.email = request.POST.get('email', employee.email)
+        employee.phone_number = request.POST.get('phone_number', employee.phone_number)
+        employee.date_of_joining = request.POST.get('date_of_joining', employee.date_of_joining)
+        employee.address = request.POST.get('address', employee.address)
+        employee.experience_description = request.POST.get('experience_description', employee.experience_description)
+
+        department_id = request.POST.get('department', employee.department_id)
+        if department_id:
+            employee.department = get_object_or_404(Department, department_id=department_id)
+
+        designation_id = request.POST.get('designation', employee.designation_id)
+        if designation_id:
+            employee.designation = get_object_or_404(Designation, designation_id=designation_id)
+
+        supervisor_id = request.POST.get('supervisor_employee_id', employee.supervisor.employee_id if employee.supervisor else None)
+        if supervisor_id:
+            if int(supervisor_id) == employee_id:
+                messages.error(request, 'Employee cannot be their own supervisor.')
+                return redirect('admin_dashboard:edit_employee', employee_id=employee_id)
+            employee.supervisor = get_object_or_404(Employee, employee_id=supervisor_id)
+        else:
+            employee.supervisor = None  # Handle the case when no supervisor is selected
+
+        employee.save()
+
+        messages.success(request, 'Employee details updated successfully.')
+        return redirect('admin_dashboard:edit_employee', employee_id=employee_id)
+
+    departments = Department.objects.all()
     designations = Designation.objects.all()
-    return render(request, 'admin_dashboard/edit_employee.html', {'employee': employee, 'designations': designations})
+    
+    context = {
+        'employee': employee,
+        'departments': departments,
+        'designations': designations,
+    }
+    
+    return render(request, 'admin_dashboard/edit_employee.html', context)
 
 @group_required('hr')
 def employee_details(request, employee_id):
@@ -173,6 +300,7 @@ def handle_employee_update_request(request, request_id):
             employee.address = request.POST.get('address', employee.address)
             employee.emergency_contact_name = request.POST.get('emergency_contact_name', employee.emergency_contact_name)
             employee.emergency_contact_number = request.POST.get('emergency_contact_number', employee.emergency_contact_number)
+            employee.emergency_contact_relationship = request.POST.get('emergency_contact_relationship', employee.emergency_contact_relationship)
             employee.experience_description = request.POST.get('experience_description', employee.experience_description)
             employee.has_profile_edit = False
 
@@ -208,3 +336,66 @@ def handle_employee_update_request(request, request_id):
 
     # Redirect back to the manage update requests page
     return redirect('admin_dashboard:employee_update_requests')
+
+@group_required('hr')
+def search_supervisor(request):
+    search_query = request.GET.get('query', '')
+    print("Search query:", search_query)
+    if search_query:
+        search_results = Employee.objects.filter(
+            first_name__icontains=search_query
+        ) | Employee.objects.filter(last_name__icontains=search_query)
+
+        results = [
+            {
+                "id": result.employee_id,
+                "name": f"{result.first_name} {result.last_name}",
+                "designation": result.designation.designation_name if result.designation else 'N/A',  # Ensure the designation field exists
+                "department": result.department.department_name if result.department else 'N/A'  # Ensure the department field exists
+            } for result in search_results
+        ]
+        return JsonResponse({"results": results})
+    return JsonResponse({"results": []})
+
+
+@group_required('hr')
+def manage_departments_and_designations(request):
+    departments = Department.objects.all()
+    designations = Designation.objects.all()
+    context = {
+        'departments': departments,
+        'designations': designations,
+    }
+    return render(request, 'admin_dashboard/manage_departments_and_designations.html', context)
+
+@group_required('hr')
+def add_department(request):
+    if request.method == 'POST':
+        dept_name = request.POST.get('department_name')
+
+        # Check if department like this already exists
+        if Department.objects.filter(department_name=dept_name).exists():
+            messages.error(request, 'Department with this name already exists.')
+        else:
+            Department.objects.create(department_name=dept_name)
+            messages.success(request, 'Department added successfully.')
+        return redirect('admin_dashboard:manage_departments_and_designations')
+    
+    return render(request, 'admin_dashboard/add_department.html')
+
+@group_required('hr')
+def add_designation(request):
+    if request.method == 'POST':
+        designation_name = request.POST.get('designation_name')
+        responsibilities = request.POST.get('responsibilities')
+
+        # Check if designation like this already exists
+        if Designation.objects.filter(designation_name=designation_name).exists():
+            messages.error(request, 'Designation with this name already exists.')
+        else:
+            Designation.objects.create(designation_name=designation_name, responsibilities=responsibilities)
+            messages.success(request, 'Designation added successfully.')
+        return redirect('admin_dashboard:manage_departments_and_designations')
+    
+    return render(request, 'admin_dashboard/add_designation.html')
+

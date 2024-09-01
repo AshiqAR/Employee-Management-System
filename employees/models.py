@@ -2,6 +2,7 @@ from django.db import models
 import uuid
 from departments.models import Department
 from django.contrib.auth.models import User
+import os
 
 class Roles(models.TextChoices):
     HR = 'hr', 'HR'
@@ -40,9 +41,9 @@ class Employee(models.Model):
 
     experience_description = models.TextField()
     role = models.CharField(max_length=20, choices=Roles.choices, default='employee')
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='employees')
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, related_name='employees',null=True)
     supervisor = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='subordinates')
-    designation = models.ForeignKey(Designation, on_delete=models.CASCADE)
+    designation = models.ForeignKey(Designation, on_delete=models.SET_NULL,null=True)
     user_account = models.OneToOneField(User, on_delete=models.CASCADE)
     
 
@@ -51,19 +52,28 @@ class Employee(models.Model):
 
     def __str__(self):
         return self.first_name + ' ' + self.last_name
+    
+
+def get_unique_file_path(instance, filename):
+    ext = filename.split('.')[-1]
+    unique_filename = f"{uuid.uuid4()}.{ext}"
+    return os.path.join('documents/', unique_filename)
 
 class Document(models.Model):
     document_id = models.AutoField(primary_key=True)
-    employee_id = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='documents')
-    document_type = models.CharField(max_length=255)
+    employee_id = models.ForeignKey(Employee, on_delete=models.SET_NULL, related_name='documents',null=True)
+    document_type = models.CharField(max_length=100)
     document_description = models.TextField()
-    document_path = models.CharField(max_length=255)
+    document_path = models.FileField(upload_to=get_unique_file_path)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     validated = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.document_type + ' - ' + self.employee_id.first_name + ' ' + self.employee_id.last_name
+
 class EmployeeUpdate(models.Model):
     request_id = models.AutoField(primary_key=True)
-    employee_id = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='update_requests')
+    employee_id = models.ForeignKey(Employee, on_delete=models.SET_NULL , related_name='update_requests',null=True)
     email = models.EmailField( default=None, blank=True, null=True)
     phone_number = models.CharField(max_length=20, default=None, blank=True, null=True)
     address = models.CharField(max_length=255, default=None, blank=True, null=True)

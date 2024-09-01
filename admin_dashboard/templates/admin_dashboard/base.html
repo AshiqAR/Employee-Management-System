@@ -191,6 +191,13 @@
           <span class="material-symbols-outlined">update</span>
           Data Update Requests
         </a>
+        <a
+          href="{% url 'admin_dashboard:manage_departments_and_designations' %}"
+          class="dashboard-button"
+        >
+          <span class="material-symbols-outlined">settings</span>
+          Manage Department
+        </a>
       </div>
       <div class="content-container">{% block content %} {% endblock %}</div>
     </div>

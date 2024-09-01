@@ -5,12 +5,14 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/edit_employee.css' %}" />
+<link rel="stylesheet" href="{% static 'css/_message_popup.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="editemployee-container">
+    {% include '_message_popup.html' %}
     <h2>Edit Employee Data</h2>
-    <form method="POST" class="employee-form">
+    <form method="POST" class="employee-form" url="{% url 'admin_dashboard:edit_employee' employee.employee_id %}">
         {% csrf_token %}
         
         <!-- Personal Data Section -->
@@ -51,6 +53,7 @@
                     id="supervisor_eid" 
                     name="supervisor_employee_id" 
                     value="{{ employee.supervisor.employee_id }}"
+                    readonly
                 >
             </div>
             <div class="form-group">
@@ -59,9 +62,20 @@
                     id="supervisor" 
                     name="supervisor"
                     value="{{ employee.supervisor.first_name }} {{ employee.supervisor.last_name }}"
-                    disabled
+                    readonly
                 >
             </div>
+
+            <!-- Search for Supervisor -->
+            <div class="form-group supervisor-search-group">
+                <label for="search_supervisor">Search Supervisor</label>
+                <div class="search-controls">
+                    <input type="text" id="search_supervisor" placeholder="Search by name">
+                    <button type="button" id="search_button">Search</button>
+                </div>
+                <div id="search-results"></div>
+            </div>
+            
         </section>
 
         <!-- Department Data Section -->
@@ -71,7 +85,7 @@
                 <label for="department">Department</label>
                 <select id="department" name="department" required>
                     {% for department in departments %}
-                    <option value="{{ department.id }}" {% if employee.department.id == department.id %}selected{% endif %}>
+                    <option value="{{ department.department_id }}" {% if employee.department.department_id == department.department_id %}selected{% endif %}>
                         {{ department.department_name }}
                     </option>
                     {% endfor %}
@@ -81,7 +95,7 @@
                 <label for="designation">Designation</label>
                 <select id="designation" name="designation" required>
                     {% for designation in designations %}
-                    <option value="{{ designation.id }}" {% if employee.designation.id == designation.id %}selected{% endif %}>
+                    <option value="{{ designation.designation_id }}" {% if employee.designation.designation_id == designation.designation_id %}selected{% endif %}>
                         {{ designation.designation_name }}
                     </option>
                     {% endfor %}
@@ -115,4 +129,37 @@
         </div>
     </form>
 </div>
+<script>
+    document.getElementById('search_button').addEventListener('click', function() {
+        let query = document.getElementById('search_supervisor').value;
+        let searchInputField = document.getElementById('search_supervisor');
+        if (query.length > 1) {  // Trigger search only after typing 3 characters
+            let url = "{% url 'admin_dashboard:search_supervisor' %}?query=" + encodeURIComponent(query);
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    let resultsContainer = document.getElementById('search-results');
+                    resultsContainer.innerHTML = ''; // Clear previous results
+    
+                    data.results.forEach(result => {
+                        let item = document.createElement('div');
+                        item.textContent = `${result.name} (ID: ${result.id}) - ${result.department}`;
+                        item.classList.add('search-item');
+    
+                        item.addEventListener('click', function() {
+                            document.getElementById('supervisor_eid').value = result.id;
+                            document.getElementById('supervisor').value = result.name;
+                            resultsContainer.innerHTML = ''; // Clear results after selection
+                            searchInputField.value = ''; // Clear search input field after selection
+                        });
+    
+                        resultsContainer.appendChild(item);
+                    });
+                });
+        }
+    });
+</script>
+
+<script src="{% static 'scripts/_message_popup.js' %}"></script>
+
 {% endblock %}

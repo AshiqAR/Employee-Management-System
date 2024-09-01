@@ -5,10 +5,12 @@
 
 {% block styles %}
   <link rel="stylesheet" href="{% static 'css/view_employees.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/_message_popup.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="template-container">
+  {% include '_message_popup.html' %}
 
   <h2>Employee List</h2>
   
@@ -46,4 +48,5 @@
   
   <!-- JavaScript for Search and Sort Functionality -->
   <script src="{% static 'scripts/view_employeesScript.js' %}"></script>
+  <script src="{% static 'scripts/_message_popup.js'}"></script>
 {% endblock %}

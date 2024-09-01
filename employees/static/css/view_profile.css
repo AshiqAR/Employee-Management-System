@@ -99,3 +99,29 @@
 .cancel-button:hover {
   background-color: #bd2130;
 }
+
+  .documents-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1em;
+    text-align: left;
+  }
+
+  .documents-list th, .documents-list td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+  }
+
+  .documents-list th {
+    background-color: #f4f4f4;
+  }
+
+  .documents-list tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+
+.upload-document-form {
+}
+

@@ -1,0 +1,104 @@
+
+  .manage-department-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .manage-department-container h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .department-container,
+  .designation-container {
+    margin-bottom: 40px;
+  }
+  
+  .department-list,
+  .designation-list {
+    margin-bottom: 20px;
+  }
+  
+  .department-list ul,
+  .designation-list ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .department-list li,
+  .designation-list li {
+    margin-bottom: 10px;
+  }
+
+  .designation-list span{
+    color: #007bff;
+  }
+  
+  .department-list a,
+  .designation-list a {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 18px;
+  }
+  
+  .department-list a:hover,
+  .designation-list a:hover {
+    text-decoration: underline;
+  }
+  
+  .department-form,
+  .designation-form {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+  }
+  
+  .department-form h3,
+  .designation-form h3 {
+    margin-bottom: 10px;
+    font-size: 20px;
+    color: #333;
+  }
+  
+  .department-form input,
+  .designation-form input {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .department-form button,
+  .designation-form button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .department-form button:hover,
+  .designation-form button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Styling for the separator */
+  hr {
+    border: 0;
+    border-top: 2px solid #ddd;
+    margin: 40px 0;
+  }
+  
+  /* Ensure responsiveness */
+  @media (max-width: 768px) {
+    .department-form input,
+    .designation-form input {
+      width: calc(100% - 10px);
+    }
+  }
+  

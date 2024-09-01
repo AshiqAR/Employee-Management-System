@@ -108,25 +108,42 @@
     <h3>Uploaded Documents</h3>
     <div class="documents-list">
       {% if documents %}
-      <ul>
-        {% for document in documents %}
-        <li>
-          {{ document.document_type }} -
-          <a href="{{ document.document_path }}">View Document</a>
-        </li>
-        {% endfor %}
-      </ul>
+        <table>
+          <thead>
+            <tr>
+              <th>Document Type</th>
+              <th>Document Description</th>
+              <th>Uploaded On</th>
+              <th>Verification Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for document in documents %}
+            <tr>
+              <td><a href="{{ document.document_path.url }}" target="_blank">{{ document.document_type }}</a></td>
+              <td>{{ document.document_description }}</td>
+              <td>{{ document.uploaded_at|date:"d-M-Y" }}</td>
+              <td>
+                {% if document.verified %}
+                <span class="verified">Verified</span>
+                {% else %}
+                <span class="unverified">Unverified</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       {% else %}
-      <p>No documents uploaded.</p>
+        <p>No documents uploaded.</p>
       {% endif %}
     </div>
+    
 
-    <form method="POST" action="{% url 'employees:add_document' %}" enctype="multipart/form-data">
+    <form class="upload-document-form" method="POST" action="{% url 'employees:upload_document' %}" enctype="multipart/form-data">
+      <h4>Upload New Document</h4>
       {% csrf_token %}
-      <div class="form-group">
-        <label for="document">Upload Documents</label>
-        <input type="file" id="document" name="document" />
-      </div>
+      {{ document_form.as_p }}
       {% if document_form.errors %}
       <div class="form-group error-messages">
         <ul>
