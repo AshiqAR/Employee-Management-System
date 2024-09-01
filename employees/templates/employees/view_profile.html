@@ -4,19 +4,12 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/view_profile.css' %}" />
+<link rel="stylesheet" href="{% static 'css/_message_popup.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="profile-container">
-  {% if messages %}
-    <div class="message-popup" id="pop-up-message-div">
-      {% for message in messages %}
-        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-          {{ message }}
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
+  {% include '_message_popup.html' %}
 
   <!-- Personal Details Section -->
   <div class="section personal-details">
@@ -280,6 +273,6 @@
   });
 </script>
 
-<script src="{% static 'scripts/view_profile.js' %}"></script>
+<script src="{% static 'scripts/message_popup.js' %}"></script>
 
 {% endblock %}
