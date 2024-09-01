@@ -6,11 +6,17 @@ from django.http import HttpResponse
 def is_in_group(user, group_name):
     return user.groups.filter(name=group_name).exists()
 
+def clear_messages(request):
+    storage = messages.get_messages(request)
+    for message in storage:
+        pass
+
 # Create your views here.
 def index(request):
     return render(request, 'users/index.html')
 
 def login_view(request):
+    clear_messages(request)
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
