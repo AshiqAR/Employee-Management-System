@@ -283,7 +283,23 @@ def my_account_view(request):
 @group_required('hr')
 def employee_update_requests(request):
     update_requests = EmployeeUpdate.objects.all()
-    return render(request, 'admin_dashboard/employee_update_requests.html', {'update_requests': update_requests})
+    documents = Document.objects.filter(validated=False)
+    return render(request, 'admin_dashboard/employee_update_requests.html', {'update_requests': update_requests, 'documents': documents})
+
+@group_required('hr')
+def handle_document_validation(request, document_id):
+    document = get_object_or_404(Document, document_id=document_id)
+    action = request.POST.get('action')
+
+    if action == 'approve':
+        document.validated = True
+        document.save()
+        messages.success(request, 'Document approved.')
+    elif action == 'reject':
+        document.delete()
+        messages.success(request, 'Document rejected.')
+
+    return redirect('admin_dashboard:employee_update_requests')
 
 @group_required('hr')
 def handle_employee_update_request(request, request_id):

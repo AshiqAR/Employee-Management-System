@@ -9,8 +9,6 @@
 {% endblock %}
 
 {% block content %}
-
-
 <div class="data-container">
     {% include '_message_popup.html' %}
     <h2>Employee Data Update Requests</h2>
@@ -31,7 +29,7 @@
         {% for request in update_requests %}
         <form action="{% url 'admin_dashboard:handle_employee_update_request' request.request_id %}" method="post">
             {% csrf_token %}
-            <div class="request-item" data-update-type="{% if request.profile_edit %}personal{% elif request.bank_edit %}bank{% else %}document{% endif %}" data-employee-name="{{ request.employee_id.first_name }} {{ request.employee_id.last_name }}" data-employee-id="{{ request.employee_id.employee_id }}">
+            <div class="request-item" data-update-type="{% if request.profile_edit %}personal{% elif request.bank_edit %}bank{% endif %}" data-employee-name="{{ request.employee_id.first_name }} {{ request.employee_id.last_name }}" data-employee-id="{{ request.employee_id.employee_id }}">
                 <h3>{{ request.employee_id.first_name }} {{ request.employee_id.last_name }} ({{ request.employee_id.employee_id }})</h3>
                 <p><strong>Department:</strong> {{ request.employee_id.department.department_name }}</p>
                 <p><strong>Designation:</strong> {{ request.employee_id.designation.designation_name }}</p>
@@ -113,17 +111,21 @@
                     </li>
                     {% endif %}
                 </ul>
-                {% else %}
-                <ul>
-                    {% for document in request.employee_id.documents.all %}
-                    <li><strong>Document Type:</strong> {{ document.document_type }} - 
-                    <a href="{{ document.document_path }}">View Document</a></li>
-                    {% endfor %}
-                </ul>
                 {% endif %}
                 <p><strong>Submitted At:</strong> {{ request.created_at }}</p>
-
                 <a href="{% url 'admin_dashboard:employee_details' request.employee_id.employee_id %}" class="btn details-btn">View Employee Details</a>
+                <button type="submit" name="action" value="approve" class="btn approve-btn">Approve</button>
+                <button type="submit" name="action" value="reject" class="btn reject-btn">Reject</button>
+            </div>
+        </form>
+        {% endfor %}
+        {% for document in documents %}
+        <form action="{% url 'admin_dashboard:handle_document_validation' document.document_id %}" method="POST">
+            {% csrf_token %}
+            <div class="document-item" data-update-type="document">
+                <p><strong>Document Type:</strong> {{ document.document_type }}</p>
+                <p><strong>Submitted At:</strong> {{ document.created_at }}</p>
+                <a href="{{ document.document_path.url }}" class="btn view-btn">View Document</a>
                 <button type="submit" name="action" value="approve" class="btn approve-btn">Approve</button>
                 <button type="submit" name="action" value="reject" class="btn reject-btn">Reject</button>
             </div>
@@ -131,42 +133,48 @@
         {% endfor %}
     </div>
 
-    {% if not update_requests %}
+    {% if not update_requests and not documents  %}
         <p>No update requests found.</p>
     {% endif %}
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const selectElement = document.getElementById('update-type-select');
-        const searchBox = document.getElementById('search-box');
-        const requestsContainer = document.getElementById('requests-container');
+    const selectElement = document.getElementById('update-type-select');
+    const searchBox = document.getElementById('search-box');
+    const requestsContainer = document.getElementById('requests-container');
 
-        function filterRequests() {
-            const selectedType = selectElement.value.toLowerCase();
-            const searchTerm = searchBox.value.toLowerCase();
-            const requestItems = requestsContainer.querySelectorAll('.request-item');
+    function filterRequests() {
+        const selectedType = selectElement.value.toLowerCase();
+        const searchTerm = searchBox.value.toLowerCase();
 
-            requestItems.forEach(item => {
-                const updateType = item.getAttribute('data-update-type');
-                const employeeName = item.getAttribute('data-employee-name').toLowerCase();
-                const employeeId = item.getAttribute('data-employee-id').toLowerCase();
+        // Get all request and document items
+        const items = requestsContainer.querySelectorAll('.request-item, .document-item');
 
-                const matchesSearch = employeeName.includes(searchTerm) || employeeId.includes(searchTerm);
-                const matchesType = updateType === selectedType || (selectedType === 'document' && !item.dataset.updateType);
+        items.forEach(item => {
+            const updateType = item.getAttribute('data-update-type');
+            const employeeName = item.getAttribute('data-employee-name') ? item.getAttribute('data-employee-name').toLowerCase() : '';
+            const employeeId = item.getAttribute('data-employee-id') ? item.getAttribute('data-employee-id').toLowerCase() : '';
 
-                if (matchesSearch && matchesType) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
+            const matchesSearch = employeeName.includes(searchTerm) || employeeId.includes(searchTerm);
+            const matchesType = (updateType === selectedType) || 
+                                (selectedType === 'document' && updateType === 'document') || 
+                                (selectedType === 'personal' && updateType === 'personal') || 
+                                (selectedType === 'bank' && updateType === 'bank');
 
-        selectElement.addEventListener('change', filterRequests);
-        searchBox.addEventListener('input', filterRequests);
-        filterRequests();
-    });
+            if (matchesSearch && matchesType) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    // Add event listeners
+    selectElement.addEventListener('change', filterRequests);
+    searchBox.addEventListener('input', filterRequests);
+    filterRequests();  // Initial filter on page load
+});
 </script>
 
 <script src="{% static 'scripts/_message_popup.js' %}"></script>

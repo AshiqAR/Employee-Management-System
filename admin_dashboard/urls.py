@@ -24,4 +24,5 @@ urlpatterns = [
     path('employee_update_requests/', views.employee_update_requests, name='employee_update_requests'),
 
     path('handle_employee_update_request/<int:request_id>/', views.handle_employee_update_request, name='handle_employee_update_request'),
+    path('validate_document/<int:document_id>/', views.handle_document_validation, name='handle_document_validation'),
 ]
