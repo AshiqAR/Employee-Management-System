@@ -146,11 +146,12 @@ def edit_employee(request, employee_id):
 
     departments = Department.objects.all()
     designations = Designation.objects.all()
-    
+    documents = Document.objects.filter(employee_id=employee_id)
     context = {
         'employee': employee,
         'departments': departments,
         'designations': designations,
+        'documents': documents,
     }
     
     return render(request, 'admin_dashboard/edit_employee.html', context)

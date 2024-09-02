@@ -119,8 +119,38 @@
         <!-- Documents Section -->
         <section class="form-section">
             <h3 class="section-heading">Documents</h3>
-            <!-- Add document fields or links here -->
-            <p>Document upload/management section here</p>
+            <div class="documents-list">
+                {% if documents %}
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Document Type</th>
+                        <th>Document Description</th>
+                        <th>Uploaded On</th>
+                        <th>Verification Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for document in documents %}
+                      <tr>
+                        <td><a href="{{ document.document_path.url }}" target="_blank">{{ document.document_type }}</a></td>
+                        <td>{{ document.document_description }}</td>
+                        <td>{{ document.uploaded_at|date:"d-M-Y" }}</td>
+                        <td>
+                          {% if document.verified %}
+                          <span class="verified">Verified</span>
+                          {% else %}
+                          <span class="unverified">Unverified</span>
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                {% else %}
+                  <p>No documents uploaded.</p>
+                {% endif %}
+            </div>
         </section>
 
         <!-- Submit Button -->

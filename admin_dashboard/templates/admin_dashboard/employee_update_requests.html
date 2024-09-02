@@ -122,10 +122,11 @@
         {% for document in documents %}
         <form action="{% url 'admin_dashboard:handle_document_validation' document.document_id %}" method="POST">
             {% csrf_token %}
-            <div class="document-item" data-update-type="document">
-                <p><strong>Document Type:</strong> {{ document.document_type }}</p>
-                <p><strong>Submitted At:</strong> {{ document.created_at }}</p>
-                <a href="{{ document.document_path.url }}" class="btn view-btn">View Document</a>
+            <div class="document-item request-item" data-update-type="document" data-employee-name="{{ document.employee_id.first_name }} {{ document.employee_id.last_name }}" data-employee-id="{{ document.employee_id.employee_id }}">
+                <p><strong>Employee:</strong>{{ document.employee_id.first_name }} {{ document.employee_id.last_name }}</p>
+                <p><strong>Document Type: </strong><a href="{{ document.document_path.url }}" class="view-btn" target="_blank">{{ document.document_type }}</a></p>
+                <p><strong>Uploaded On:</strong> {{ document.uploaded_at }}</p>
+                <a href="{% url 'admin_dashboard:employee_details' document.employee_id.employee_id %}" class="btn details-btn">View Employee Details</a>
                 <button type="submit" name="action" value="approve" class="btn approve-btn">Approve</button>
                 <button type="submit" name="action" value="reject" class="btn reject-btn">Reject</button>
             </div>

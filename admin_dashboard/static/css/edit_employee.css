@@ -159,3 +159,32 @@
   font-size: 13px;
   color: #666;
 }
+
+.documents-list {
+  grid-column: span 3;
+}
+
+.documents-list table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.documents-list th,
+.documents-list td {
+  border: 1px solid #ddd;
+  text-align: left;
+  padding: 8px;
+}
+
+.documents-list th {
+  background-color: #f4f4f4;
+}
+
+.documents-list .verified {
+  color: #28a745; /* Green color for verified */
+}
+
+.documents-list .unverified {
+  color: #dc3545; /* Red color for unverified */
+}
