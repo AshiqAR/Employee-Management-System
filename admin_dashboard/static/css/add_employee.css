@@ -9,52 +9,71 @@
   gap: 20px;
 }
 
-/* Style for form groups */
-.form-group {
-  display: flex;
-  flex-direction: column;
+/* Form Title */
+.addemployee-container h2 {
+  margin-bottom: 20px;
+  color: #333;
 }
 
-/* Label styles */
-.form-group label {
-  margin-bottom: 8px;
-  font-weight: bold;
-  color: #003d7a; /* Matches header color */
+/* Form Styles */
+.employee-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
 }
 
-/* Input and select styles */
-.form-group input,
-.form-group select {
+.employee-form .form-control {
+  width: 100%;
   padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #fff;
-}
-
-/* Submit button styles */
-.submit-button {
-  padding: 8px;
-  background-color: var(--primary-color); /* Primary color */
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
   font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.employee-form .form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Labels */
+.employee-form label {
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #555;
+}
+
+/* Full-width Input Fields */
+.employee-form .full-width {
   grid-column: span 3;
-  height: 40px;
-  width: 50%;
-  margin: 20px auto;
-  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.submit-button:hover {
+/* Submit Button */
+.employee-form .btn-primary {
+  grid-column: span 3;
+  padding: 12px 20px;
+  width: 40%;
+  margin: 10px auto;
+  font-size: 16px;
+  color: #fff;
   background-color: var(--secondary-color);
-  transform: scale(1.02);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-@media (max-width: 768px) {
+.employee-form .btn-primary:hover {
+  background-color: #0253a9;
+}
+
+/* Media Query for Mobile Responsiveness */
+@media (max-width: 600px) {
   .employee-form {
-    grid-template-columns: 1fr;
+      grid-template-columns: 1fr;
+  }
+
+  .employee-form .btn-primary {
+      grid-column: span 1;
   }
 }

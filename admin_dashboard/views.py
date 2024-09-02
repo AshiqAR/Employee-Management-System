@@ -11,6 +11,8 @@ from attendance.models import Attendance
 from leave.models import Leave, LeaveRequest
 from django.contrib.auth.models import User, Group
 
+from .forms import EmployeeForm
+
 def validate_password(password):
     if len(password) < 8:
         return False, 'Password must be at least 8 characters long.'
@@ -34,92 +36,29 @@ def group_required(group_name):
 
 @group_required('hr')
 def add_employee(request):
+    form = EmployeeForm()
     if request.method == 'POST':
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        email = request.POST.get('email')
-        phone_number = request.POST.get('phone_number')
-        date_of_birth = request.POST.get('date_of_birth')
-        date_of_joining = request.POST.get('date_of_joining')
-        address = request.POST.get('address', 'No Address')
-        bank_name = request.POST.get('bank_name')
-        bank_account_number = request.POST.get('bank_account_number')
-        ifsc_code = request.POST.get('ifsc_code')
-        department_id = request.POST.get('department_id')
-        designation_id = request.POST.get('designation_id')
-        role = request.POST.get('role')
-        supervisor_id = request.POST.get('supervisor_id')
-
-        # Fetch related objects
-        try:
-            department = Department.objects.get(department_id=department_id)
-            print('department found')
-            designation = Designation.objects.get(designation_id=designation_id)
-            print('designation found')
-        except Department.DoesNotExist:
-            messages.error(request, "Invalid department selected.")
-            return redirect('admin_dashboard:add_employee')
-        except Designation.DoesNotExist:
-            messages.error(request, "Invalid designation selected.")
-            return redirect('admin_dashboard:add_employee')
-
-        supervisor = None
-        if supervisor_id:
-            print('supervisor_id:', supervisor_id)
+        form = EmployeeForm(request.POST)
+        if form.is_valid():
             try:
-                supervisor = Employee.objects.get(employee_id=supervisor_id)
-            except Employee.DoesNotExist:
-                messages.error(request, "Invalid supervisor selected.")
+                user_account = User.objects.create_user(
+                    username=form.cleaned_data['email'],
+                    email=form.cleaned_data['email'],
+                    first_name=form.cleaned_data['first_name'],
+                    last_name=form.cleaned_data['last_name'],
+                    password=f"{form.cleaned_data['first_name'].lower()}@123",
+                    is_staff=True if form.cleaned_data['role'] == 'hr' else False
+                )
+                group = Group.objects.get(name=form.cleaned_data['role'])
+                user_account.groups.add(group)
+            except Exception as e:
+                messages.error(request, "A user with the same username or email already exists.")
                 return redirect('admin_dashboard:add_employee')
 
-        # Create the user account
-        try:
-            user_account = User.objects.create_user(
-                username=email,
-                email=email,
-                first_name=first_name,
-                last_name=last_name,
-                password=f"{first_name.lower()}@123",
-                is_staff=True if role == 'hr' else False
-            )
-            group = Group.objects.get(name=role)
-            user_account.groups.add(group)
-
-        except Exception as e:
-            messages.error(request, f"same username or password exists")
-            return redirect('admin_dashboard:add_employee')
-        
-        # Create the employee
-        employee = Employee.objects.create(
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-            phone_number=phone_number,
-            date_of_birth=date_of_birth,
-            date_of_joining=date_of_joining,
-            address=address,
-            bank_name=bank_name,
-            bank_account_number=bank_account_number,
-            ifsc_code=ifsc_code,
-            department=department,
-            designation=designation,
-            role=role,
-            supervisor=supervisor,
-            user_account=user_account
-        )
-
-        messages.success(request, f"Employee {employee.first_name} {employee.last_name} added successfully.")
-        return redirect('admin_dashboard:index')
-
-    # Handle GET request
-    designations = Designation.objects.all()
-    departments = Department.objects.all()
-    context = {
-        'designations': designations,
-        'departments': departments,
-    }
-
-    return render(request, 'admin_dashboard/add_employee.html', context)
+            form.save(user_account=user_account)
+            messages.success(request, 'Employee added successfully.')
+            return redirect('admin_dashboard:index')
+    return render(request, 'admin_dashboard/add_employee.html', {'form': form})
 
 @group_required('hr')
 def index(request):

@@ -1,3 +1,4 @@
+from typing import Any
 from django import forms
 from departments.models import Department
 from employees.models import Employee, Designation
@@ -10,9 +11,6 @@ class DepartmentForm(forms.ModelForm):
             'department_name': forms.TextInput(attrs={'class': 'form-control'}),
         }
     department_id = forms.UUIDField(required=False, widget=forms.HiddenInput())
-
-from django import forms
-from .models import Employee, Designation
 
 class EmployeeForm(forms.ModelForm):
     class Meta:
@@ -54,7 +52,15 @@ class EmployeeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(EmployeeForm, self).__init__(*args, **kwargs)
-        # Populate the designation field with available designations
         self.fields['designation'].queryset = Designation.objects.all()
         self.fields['department'].queryset = Department.objects.all()
-        
+        self.fields['department'].label_from_instance = lambda obj: obj.department_name
+
+    def save(self, commit=True, user_account=None):
+        employee = super().save(commit=False)
+        if user_account:
+            employee.user_account = user_account
+        if commit:
+            employee.save()
+        return employee
+
