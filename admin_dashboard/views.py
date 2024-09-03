@@ -8,7 +8,7 @@ from django.db import IntegrityError
 
 from employees.models import Designation, Employee, Document, EmployeeUpdate, Department
 from attendance.models import Attendance
-from leave.models import Leave, LeaveRequest
+from leave.models import Leave, LeaveRequest, LeaveStatus
 from django.contrib.auth.models import User, Group
 
 from .forms import EmployeeForm
@@ -80,26 +80,42 @@ def leave_requests(request):
 @group_required('hr')
 def review_leave_request(request, leave_request_id):
     leave_request = get_object_or_404(LeaveRequest, leave_request_id=leave_request_id)
+    
     if request.method == 'POST':
         action = request.POST.get('action')
-        if action == 'approve':
-            leave_request.status = 'approved'
-            leave_request.start_date = request.POST.get('approval_start_date')
-            leave_request.end_date = request.POST.get('approval_end_date')
-            leave_request.comments = request.POST.get('comments')
+        comments = request.POST.get('comments')
+        approval_start_date = request.POST.get('approval_start_date')
+        approval_end_date = request.POST.get('approval_end_date')
 
-            print('start date:', leave_request.start_date)
-            print('approved')
+        if action == 'approve':
+            # Validate approval dates
+            if not approval_start_date or not approval_end_date:
+                return render(request, 'admin_dashboard/review_leave_request.html', {
+                    'leave_request': leave_request,
+                    'error': 'Approval dates are required'
+                })
+            
+            if approval_start_date > approval_end_date:
+                return render(request, 'admin_dashboard/review_leave_request.html', {
+                    'leave_request': leave_request,
+                    'error': 'Approval end date cannot be before start date'
+                })
+
+            # Approve the leave
+            leave_request.remarks = comments
+            leave_request.approve_leave(approval_start_date, approval_end_date)
+            print('Leave request approved')
 
         elif action == 'reject':
-            leave_request.status = 'rejected'
-            leave_request.comments = request.POST.get('comments')
-            print('rejected')
-            
-        return redirect('admin_dashboard:review_leave_request', leave_request_id=leave_request_id)
+            leave_request.remarks = comments
+            leave_request.reject_leave()
+            print('Leave request rejected')
+        
+        return redirect('admin_dashboard:leave_requests')
     
-    # Render the form for GET requests or after POST processing
-    return render(request, 'admin_dashboard/review_leave_request.html', {'leave_request': leave_request})
+    return render(request, 'admin_dashboard/review_leave_request.html', {
+        'leave_request': leave_request
+    })
 
 
 @group_required('hr')

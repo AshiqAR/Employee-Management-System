@@ -149,7 +149,6 @@
         const selectedType = selectElement.value.toLowerCase();
         const searchTerm = searchBox.value.toLowerCase();
 
-        // Get all request and document items
         const items = requestsContainer.querySelectorAll('.request-item, .document-item');
 
         items.forEach(item => {
@@ -171,10 +170,9 @@
         });
     }
 
-    // Add event listeners
     selectElement.addEventListener('change', filterRequests);
     searchBox.addEventListener('input', filterRequests);
-    filterRequests();  // Initial filter on page load
+    filterRequests(); 
 });
 </script>
 

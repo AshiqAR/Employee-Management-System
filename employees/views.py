@@ -4,10 +4,12 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib import messages
 from django.contrib.messages import get_messages
+from leave.forms import LeaveRequestForm
 
 from .forms import PersonalDetailsForm, BankDetailsForm, DocumentForm
 from django.contrib.auth.models import User
 from .models import Employee, Document, EmployeeUpdate
+from leave.models import LeaveRequest, Leave
 
 def clear_messages(request):
     storage = messages.get_messages(request)
@@ -294,4 +296,20 @@ def upload_document(request):
 
 @group_required('employee')
 def leave_application_view(request):
-    return render(request, 'employees/leave_applications.html')
+    employee = get_object_or_404(Employee, user_account=request.user)
+    if request.method == 'POST':
+        print(request.POST)
+        form = LeaveRequestForm(request.POST)
+        if form.is_valid():
+            form.save(employee=employee)
+            return redirect('employees:leave_applications')
+    else:
+        form = LeaveRequestForm()
+
+    leave_applications = LeaveRequest.objects.filter(employee = employee)
+    leaves = Leave.objects.filter(employee = employee)
+    return render(request, 'employees/leave_applications.html', {
+        'form': form,
+        'leave_applications': leave_applications,
+        'leaves': leaves
+    })

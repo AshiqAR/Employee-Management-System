@@ -4,20 +4,26 @@
 {% block title %}Leave Applications{% endblock %}
 
 {% block styles %}
-
 <link rel="stylesheet" href="{% static 'css/leave_applications.css' %}" />
-
 {% endblock %}
 
 {% block content %}
-<h2>Leave Applications</h2>
+<h2 class="leave-heading">Leave Applications</h2>
+
+<!-- Button to open the modal -->
+<button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#leaveRequestModal">
+    Request Leave
+</button>
+
 <div class="leave-applications-container">
-    <table>
+    <h3>Leave Requests</h3>
+    {% if leave_applications %}
+    <table class="table table-bordered">
         <thead>
             <tr>
                 <th>Leave Type</th>
-                <th>Start Date</th>
-                <th>End Date</th>
+                <th>Period of Leave Requested</th>
+                <th>Remarks</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -25,14 +31,65 @@
             {% for leave_application in leave_applications %}
             <tr>
                 <td>{{ leave_application.leave_type }}</td>
-                <td>{{ leave_application.start_date }}</td>
-                <td>{{ leave_application.end_date }}</td>
+                <td>{{ leave_application.start_date|date:'d-m-Y' }} to {{ leave_application.end_date|date:'d-m-Y' }}</td>
+                <td>{{ leave_application.remarks }}</td>
                 <td>{{ leave_application.status }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-</div>
-</div>
-{% endblock %}
+    {% else %}
+    <p>No leave requests found</p>
+    {% endif %}
 
+    <h3>Leaves</h3>
+    {% if leaves %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Leave Type</th>
+                <th>Approved Period</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for leave in leaves %}
+            <tr>
+                <td>{{ leave.leave_type }}</td>
+                <td>{{ leave.approved_start_date|date:'d-m-Y' }} to {{ leave.approved_end_date|date:'d-m-Y' }}</td>
+                <td>{{ leave.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No leaves found</p>
+    {% endif %}
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="leaveRequestModal" tabindex="-1" aria-labelledby="leaveRequestModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="leaveRequestModalLabel">Request Leave</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" id="leaveRequestForm" action="{% url 'employees:leave_applications' %}">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+{% endblock %}
