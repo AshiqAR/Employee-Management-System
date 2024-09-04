@@ -9,9 +9,11 @@ from django.db import IntegrityError
 from employees.models import Designation, Employee, Document, EmployeeUpdate, Department
 from attendance.models import Attendance
 from leave.models import Leave, LeaveRequest, LeaveStatus
+from datetime import date
+
 from django.contrib.auth.models import User, Group
 
-from .forms import EmployeeForm
+from .forms import EmployeeForm, AttendanceForm
 
 def validate_password(password):
     if len(password) < 8:
@@ -68,8 +70,30 @@ def index(request):
 
 @group_required('hr')
 def add_attendance(request):
+    today = date.today()
     employees = Employee.objects.all()
-    return render(request, 'admin_dashboard/add_attendance.html', {'employees': employees})
+
+    if request.method == 'POST':
+        attendance_date = request.POST.get('attendance_date')
+        for employee in employees:
+            form = AttendanceForm(request.POST, prefix=str(employee.employee_id))
+            if form.is_valid():
+                attendance = form.save(commit=False)
+                attendance.employee_id = employee
+                attendance.date = attendance_date
+                attendance.save()
+        return redirect('attendance:success')  # Redirect after submission
+
+    # Create a form for each employee
+    forms = [AttendanceForm(prefix=str(employee.employee_id)) for employee in employees]
+
+    context = {
+        'today': today,
+        'employees': employees,
+        'forms': forms,
+    }
+    return render(request, 'admin_dashboard/add_attendance.html', context)
+
 
 @group_required('hr')
 def leave_requests(request):

@@ -1,27 +1,30 @@
 {% extends "admin_dashboard/base.html" %}
 {% load static %}
 
-{% block title %}Add Attendance{% endblock %} 
+{% block title %}Add Attendance{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/add_attendance.css' %}" />
 {% endblock %}
 
 {% block content %}
-
 <h2>Add Attendance</h2>
-<form action="{% url 'admin_dashboard:add_attendance' %}" method="POST">
+
+<form id="main-form" method="post">
   {% csrf_token %}
+  
   <div class="form-section">
     <label for="attendance_date">Select Date:</label>
     <input
       type="date"
       id="attendance_date"
       name="attendance_date"
-      max="{{ current_date }}"
+      max="{{ today|date:'Y-m-d' }}"
+      value="{{ today|date:'Y-m-d' }}"
       required
     />
   </div>
+  
   <div class="form-section">
     <label for="employee_search">Search Employee by Name:</label>
     <input
@@ -32,57 +35,51 @@
       onkeyup="searchEmployee()"
     />
   </div>
-  <div class="form-section">
-    <table class="attendance-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Work Type</th>
-          <th>Attendance Status</th>
-          <th>Overtime Hours</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="employee-list">
-        {% for employee in employees %}
-        <tr>
-          <td>{{ employee.employee_id }}</td>
-          <td>{{ employee.first_name }} {{ employee.last_name }}</td>
-          <td>{{ employee.work_type }}</td>
-          <td>
-            <select name="attendance_status_{{ employee.employee_id }}">
-              <option value="Present">Present</option>
-              <option value="Absent">Absent</option>
-            </select>
-          </td>
-          <td>
-            <input
-              type="number"
-              name="overtime_hours_{{ employee.employee_id }}"
-              min="0"
-              max="8"
-              size="2"
-              placeholder="Hours"
-            />
-          </td>
-          <td>
-            <button
-              type="button"
-              onclick="saveAttendance('{{ employee.employee_id }}')"
-            >
-              Save
-            </button>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+
+  <div class="attendance-container" id="employee-list">
+    {% for form in forms %}
+    <div class="attendance-row">
+      <div>{{ employee.employee_id }}</div>
+      <div>{{ employee.first_name }} {{ employee.last_name }}</div>
+      
+      <div>
+        {{ form.attendance_type.label_tag }} {{ form.attendance_type }}
+      </div>
+
+      <div>
+        {{ form.work_type.label_tag }} {{ form.work_type }}
+      </div>
+
+      <div>
+        {{ form.shift.label_tag }} {{ form.shift }}
+      </div>
+
+      <div>
+        {{ form.is_overtime.label_tag }} {{ form.is_overtime }}
+      </div>
+
+      <div>
+        {{ form.overtime_hours.label_tag }} {{ form.overtime_hours }}
+      </div>
+
+    </div>
+    {% endfor %}
   </div>
+
   <div class="form-section">
     <button type="submit">Submit Attendance</button>
   </div>
 </form>
-
-<script src="{% static 'scripts/add_attendance.js' %}"></script>
 {% endblock %}
+
+<script>
+function searchEmployee() {
+    const query = document.getElementById('employee_search').value.toLowerCase();
+    const rows = document.querySelectorAll('.attendance-row');
+
+    rows.forEach(row => {
+        const name = row.querySelector('div:nth-child(2)').innerText.toLowerCase();
+        row.style.display = name.includes(query) ? '' : 'none';
+    });
+}
+</script>

@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'users',
     'leave',
     'departments',
+    'rest_framework',
+    'apis',
 ]
 
 MIDDLEWARE = [

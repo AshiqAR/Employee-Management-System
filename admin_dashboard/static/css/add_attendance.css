@@ -1,43 +1,70 @@
+/* add_attendance.css */
+
+/* General Form Section Styling */
 .form-section {
-    margin-bottom: 10px;
-  }
+  margin-bottom: 20px;
+}
 
-  .attendance-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
+/* Attendance Date and Employee Search Input Styling */
+.form-section input[type="date"],
+.form-section input[type="text"] {
+  padding: 8px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
 
-  .attendance-table th,
-  .attendance-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-  }
+/* Container for Attendance Rows */
+.attendance-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-  .attendance-table th {
-    background-color: var(--primary-color);
-    color: white;
-  }
+/* Attendance Row Styling */
+.attendance-row {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
 
-  .attendance-table tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
+/* Ensures all rows have consistent styles */
+.attendance-row:first-child {
+  margin-top: 10px;
+}
 
-  .attendance-table tr:hover {
-    background-color: #ddd;
-  }
+/* Individual Cells within the Attendance Row */
+.attendance-row > div {
+  flex: 1;
+  padding: 0 10px;
+  text-align: center;
+  box-sizing: border-box;
+}
 
-  .attendance-table button {
-    padding: 6px 12px; /* Adjusted padding for the button */
-    font-size: 12px; /* Adjusted font size */
-  }
+/* Form Input Elements */
+.attendance-row select,
+.attendance-row input {
+  width: 100%;
+  padding: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
 
-  .form-section input[type="date"] {
-    padding: 8px;
-    font-size: 14px;
-  }
+/* Button Styling */
+button[type="submit"] {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: block;
+  margin: 20px auto;
+}
 
-  .form-section input[type="text"] {
-    padding: 8px;
-    font-size: 14px;
-  }
+button[type="submit"]:hover {
+  background-color: #0056b3;
+}

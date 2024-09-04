@@ -2,6 +2,7 @@ from typing import Any
 from django import forms
 from departments.models import Department
 from employees.models import Employee, Designation
+from attendance.models import Attendance, Shift, AttendanceType, WorkType
 
 class DepartmentForm(forms.ModelForm):
     class Meta:
@@ -64,3 +65,16 @@ class EmployeeForm(forms.ModelForm):
             employee.save()
         return employee
 
+
+class AttendanceForm(forms.ModelForm):
+    class Meta:
+        model = Attendance
+        fields = ['date', 'attendance_type', 'work_type', 'shift', 'is_overtime', 'overtime_hours']
+
+    # Adding additional widgets and customization
+    date = forms.DateField(widget=forms.SelectDateWidget)
+    attendance_type = forms.ChoiceField(choices=AttendanceType.choices, widget=forms.Select)
+    work_type = forms.ChoiceField(choices=WorkType.choices, widget=forms.Select)
+    shift = forms.ModelChoiceField(queryset=Shift.objects.all(), widget=forms.Select)
+    is_overtime = forms.BooleanField(required=False)
+    overtime_hours = forms.IntegerField(min_value=0, max_value=8, required=False)
