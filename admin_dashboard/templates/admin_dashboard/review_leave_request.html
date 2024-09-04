@@ -48,8 +48,8 @@
         <div class="form-group approval-dates">
             <label>Approve Leave For:</label>
             <div class="date-inputs">
-                <input type="date" id="approval_start_date" name="approval_start_date" value="{{ leave_request.start_date|date:'Y-m-d' }}" />
-                <input type="date" id="approval_end_date" name="approval_end_date" value="{{ leave_request.end_date|date:'Y-m-d' }}" />
+                <input type="date" id="approval_start_date" name="approval_start_date" value="{{ leave_request.start_date|date:'Y-m-d' }}" min="{{ leave_request.start_date|date:'Y-m-d' }}" max="{{ leave_request.end_date|date:'Y-m-d' }}"/>
+                <input type="date" id="approval_end_date" name="approval_end_date" value="{{ leave_request.end_date|date:'Y-m-d' }}" min="{{ leave_request.start_date|date:'Y-m-d' }}" max="{{ leave_request.end_date|date:'Y-m-d' }}"/>
             </div>
         </div>
 
