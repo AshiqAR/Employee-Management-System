@@ -88,7 +88,6 @@ def add_attendance(request):
 
     context = {
         'today': today,
-        'employee_forms': employee_forms,
     }
     return render(request, 'admin_dashboard/add_attendance.html', context)
 

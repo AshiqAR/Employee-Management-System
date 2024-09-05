@@ -1,50 +1,82 @@
 {% extends "admin_dashboard/base.html" %}
 {% load static %}
 
-{% block title %}Add Attendance{% endblock %}
+{% block title %}Update Attendance{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{% static 'css/add_attendance.css' %}" />
 {% endblock %}
 
 {% block content %}
-<h2>Add Attendance for {{ today }}</h2>
+<h2>Update Attendance</h2>
 
-<form method="post">
-    {% csrf_token %}
-    
-    <div class="date-selector">
-        <label for="attendance_date">Select Date:</label>
-        <input type="date" id="attendance_date" name="attendance_date" value="{{ today|date:'Y-m-d' }}" required>
-    </div>
+<div class="date-selector">
+    <label for="attendance_date">Select Date:</label>
+    <input type="date" id="attendance_date" name="attendance_date" value="{{ today|date:'Y-m-d' }}" max="{{ today|date:'Y-m-d' }}" required>
+</div>
 
-    <!-- Loop through each employee and their corresponding form -->
-    {% for employee, form in employee_forms %}
-        <div class="employee-attendance">
-            <h3>{{ employee.first_name }} {{ employee.last_name }}</h3>
-            <p>ID: {{ employee.employee_id }}</p>
-            <p>Designation: {{ employee.designation }}</p>
-            <p>Department: {{ employee.department.department_name }}</p>
-            
-            <div class="attendance-form">
-                {{ form.as_p }}
-            </div>
-        </div>
-    {% endfor %}
-
-    <button type="submit">Save Attendance</button>
-</form>
-
-{% endblock %}
+<div id="attendance-forms-container"></div>
 
 <script>
-function searchEmployee() {
-    const query = document.getElementById('employee_search').value.toLowerCase();
-    const rows = document.querySelectorAll('.employee-attendance');
+    function createAttendanceForm(employee, attendance) {
+        // Create the form element
+        const formDiv = document.createElement('form');
+        formDiv.classList.add('employee-attendance');
+        formDiv.method = 'POST';
+        formDiv.innerHTML = `
+            <h3>${employee.first_name} ${employee.last_name}</h3>
+            <p>ID: ${employee.employee_id}</p>
+            <p>Designation: ${employee.designation.designation_name}</p>
+            <p>Department: ${employee.department.department_name}</p>
 
-    rows.forEach(row => {
-        const name = row.querySelector('h3').innerText.toLowerCase();
-        row.style.display = name.includes(query) ? '' : 'none';
+            <div class="attendance-form">
+                <label for="attendance_type_${employee.employee_id}">Attendance Type:</label>
+                <select id="attendance_type_${employee.employee_id}" name="attendance_type_${employee.employee_id}">
+                    <option value="Present" ${attendance.attendance_type === 'Present' ? 'selected' : ''}>Present</option>
+                    <option value="Absent" ${attendance.attendance_type === 'Absent' ? 'selected' : ''}>Absent</option>
+                    <option value="Leave" ${attendance.attendance_type === 'Leave' ? 'selected' : ''}>Leave</option>
+                </select>
+            </div>
+            <input type="hidden" name="employee_id" value="${employee.employee_id}">
+            <button type="submit">Save</button>
+        `;
+        return formDiv;
+    }
+
+    function getAttendance() {
+        const date = document.getElementById('attendance_date').value;
+
+        const baseUrl = '{% url "apis:get_attendance_by_date" date="DATE_PLACEHOLDER" %}';
+        const fetchUrl = baseUrl.replace('DATE_PLACEHOLDER', date);
+
+        // Clear the existing forms
+        const container = document.getElementById('attendance-forms-container');
+        container.innerHTML = '';
+
+        fetch(fetchUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    data.forEach(attendance_data => {
+                        const employee = attendance_data.employee;
+                        const attendance = attendance_data.attendance;
+
+                        const form = createAttendanceForm(employee, attendance);
+                        container.appendChild(form);
+                    });
+                } else {
+                    alert('No attendance data found for the selected date.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching attendance data:', error);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        getAttendance();
+        document.getElementById('attendance_date').addEventListener('change', getAttendance);
     });
-}
 </script>
+
+{% endblock %}

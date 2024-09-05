@@ -1,36 +1,54 @@
-function searchEmployee() {
-    var input, filter, table, rows, cells, i, j, txtValue;
-    input = document.getElementById("employee_search");
-    filter = input.value.toLowerCase();
-    table = document.getElementById("employee-list");
-    rows = table.getElementsByTagName("tr");
+function createAttendanceForm(employee, attendance) {
+  const date = document.getElementById('attendance_date').value;
+  const form = document.getElementById('attendance-forms-container').appendChild(document.createElement('form'));
+  console.log(form);
+  form.setAttribute('class', 'attendance-form');
+  form.setAttribute('method', 'POST');
+  form.innerHTML = `
+      <h3>${employee.first_name} ${employee.last_name}</h3>
+      <p>ID: ${employee.employee_id}</p>
+      <p>Designation: ${employee.designation}</p>
+      <p>Department: ${employee.department.department_name}</p>
 
-    for (i = 0; i < rows.length; i++) {
-      cells = rows[i].getElementsByTagName("td");
-      for (j = 0; j < cells.length; j++) {
-        if (cells[j]) {
-          txtValue = cells[j].textContent || cells[j].innerText;
-          if (txtValue.toLowerCase().indexOf(filter) > -1) {
-            rows[i].style.display = "";
-            break;
+      <div class="attendance-form">
+          <label for="attendance_type_${employee.employee_id}">Attendance Type:</label>
+          <select id="attendance_type_${employee.employee_id}" name="attendance_type_${employee.employee_id}">
+              <option value="Present" ${attendance.attendance_type === 'Present' ? 'selected' : ''}>Present</option>
+              <option value="Absent" ${attendance.attendance_type === 'Absent' ? 'selected' : ''}>Absent</option>
+              <option value="Leave" ${attendance.attendance_type === 'Leave' ? 'selected' : ''}>Leave</option>
+          </select>
+      </div>
+  `;
+  return form;
+}
+
+function getAttendance() {
+  const date = document.getElementById('attendance_date').value;
+
+  const baseUrl = '{% url "apis:get_attendance_by_date" date="DATE_PLACEHOLDER" %}';
+  const fetchUrl = baseUrl.replace('DATE_PLACEHOLDER', date);
+
+  fetch(fetchUrl)
+      .then(response => response.json())
+      .then(data => {
+          if (data.length > 0) {
+              data.forEach(attendance_data => {
+                  const employee = attendance_data.employee;
+                  const attendance = attendance_data.attendance;
+
+                  const form = createAttendanceForm(employee, attendance);
+                  container.appendChild(form);
+              });
           } else {
-            rows[i].style.display = "none";
+              alert('No attendance data found for the selected date.');
           }
-        }
-      }
-    }
-  }
+      })
+      .catch(error => {
+          console.error('Error fetching attendance data:', error);
+      });
+}
 
-  function saveAttendance(employeeId) {
-    employeeId = parseInt(employeeId);
-    console.log("Saving attendance for employee ID:", employeeId);
-    console.log("data : ", {
-      attendance_status: document.querySelector(
-        `select[name="attendance_status_${employeeId}"]`
-      ).value,
-      overtime_hours: document.querySelector(
-        `input[name="overtime_hours_${employeeId}"]`
-      ).value,
-    });
-    // You can use AJAX or a form submission to handle the save action
-  }
+document.addEventListener('DOMContentLoaded', () => {
+  getAttendance();
+  document.getElementById('attendance_date').addEventListener('change', getAttendance);
+});
