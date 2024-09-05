@@ -8,77 +8,42 @@
 {% endblock %}
 
 {% block content %}
-<h2>Add Attendance</h2>
+<h2>Add Attendance for {{ today }}</h2>
 
-<form id="main-form" method="post">
-  {% csrf_token %}
-  
-  <div class="form-section">
-    <label for="attendance_date">Select Date:</label>
-    <input
-      type="date"
-      id="attendance_date"
-      name="attendance_date"
-      max="{{ today|date:'Y-m-d' }}"
-      value="{{ today|date:'Y-m-d' }}"
-      required
-    />
-  </div>
-  
-  <div class="form-section">
-    <label for="employee_search">Search Employee by Name:</label>
-    <input
-      type="text"
-      id="employee_search"
-      name="employee_search"
-      placeholder="Search by name..."
-      onkeyup="searchEmployee()"
-    />
-  </div>
-
-  <div class="attendance-container" id="employee-list">
-    {% for form in forms %}
-    <div class="attendance-row">
-      <div>{{ employee.employee_id }}</div>
-      <div>{{ employee.first_name }} {{ employee.last_name }}</div>
-      
-      <div>
-        {{ form.attendance_type.label_tag }} {{ form.attendance_type }}
-      </div>
-
-      <div>
-        {{ form.work_type.label_tag }} {{ form.work_type }}
-      </div>
-
-      <div>
-        {{ form.shift.label_tag }} {{ form.shift }}
-      </div>
-
-      <div>
-        {{ form.is_overtime.label_tag }} {{ form.is_overtime }}
-      </div>
-
-      <div>
-        {{ form.overtime_hours.label_tag }} {{ form.overtime_hours }}
-      </div>
-
+<form method="post">
+    {% csrf_token %}
+    
+    <div class="date-selector">
+        <label for="attendance_date">Select Date:</label>
+        <input type="date" id="attendance_date" name="attendance_date" value="{{ today|date:'Y-m-d' }}" required>
     </div>
-    {% endfor %}
-  </div>
 
-  <div class="form-section">
-    <button type="submit">Submit Attendance</button>
-  </div>
+    <!-- Loop through each employee and their corresponding form -->
+    {% for employee, form in employee_forms %}
+        <div class="employee-attendance">
+            <h3>{{ employee.first_name }} {{ employee.last_name }}</h3>
+            <p>ID: {{ employee.employee_id }}</p>
+            <p>Designation: {{ employee.designation }}</p>
+            <p>Department: {{ employee.department.department_name }}</p>
+            
+            <div class="attendance-form">
+                {{ form.as_p }}
+            </div>
+        </div>
+    {% endfor %}
+
+    <button type="submit">Save Attendance</button>
 </form>
+
 {% endblock %}
 
 <script>
 function searchEmployee() {
     const query = document.getElementById('employee_search').value.toLowerCase();
-    const rows = document.querySelectorAll('.attendance-row');
+    const rows = document.querySelectorAll('.employee-attendance');
 
     rows.forEach(row => {
-        const name = row.querySelector('div:nth-child(2)').innerText.toLowerCase();
+        const name = row.querySelector('h3').innerText.toLowerCase();
         row.style.display = name.includes(query) ? '' : 'none';
     });
 }

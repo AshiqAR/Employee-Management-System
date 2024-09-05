@@ -69,12 +69,18 @@ class EmployeeForm(forms.ModelForm):
 class AttendanceForm(forms.ModelForm):
     class Meta:
         model = Attendance
-        fields = ['date', 'attendance_type', 'work_type', 'shift', 'is_overtime', 'overtime_hours']
-
-    # Adding additional widgets and customization
-    date = forms.DateField(widget=forms.SelectDateWidget)
-    attendance_type = forms.ChoiceField(choices=AttendanceType.choices, widget=forms.Select)
-    work_type = forms.ChoiceField(choices=WorkType.choices, widget=forms.Select)
-    shift = forms.ModelChoiceField(queryset=Shift.objects.all(), widget=forms.Select)
-    is_overtime = forms.BooleanField(required=False)
-    overtime_hours = forms.IntegerField(min_value=0, max_value=8, required=False)
+        fields = [ 'attendance_type', 'work_type', 'overtime_hours']
+        widgets = {
+            'date': forms.SelectDateWidget(),
+            'attendance_type': forms.Select(attrs={'class': 'form-control'}),
+            'work_type': forms.Select(attrs={'class': 'form-control'}),
+            'overtime_hours': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'date': 'Date',
+            'attendance_type': 'Attendance Type',
+            'work_type': 'Work Type',
+            'shift': 'Shift',
+            'is_overtime': 'Is Overtime',
+            'overtime_hours': 'Overtime Hours',
+        }

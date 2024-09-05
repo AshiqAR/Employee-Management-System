@@ -79,21 +79,18 @@ def add_attendance(request):
             form = AttendanceForm(request.POST, prefix=str(employee.employee_id))
             if form.is_valid():
                 attendance = form.save(commit=False)
-                attendance.employee_id = employee
+                attendance.employee = employee
                 attendance.date = attendance_date
                 attendance.save()
-        return redirect('attendance:success')  # Redirect after submission
+        return redirect('attendance:add_attendance')
 
-    # Create a form for each employee
-    forms = [AttendanceForm(prefix=str(employee.employee_id)) for employee in employees]
+    employee_forms = [(employee, AttendanceForm(prefix=str(employee.employee_id))) for employee in employees]
 
     context = {
         'today': today,
-        'employees': employees,
-        'forms': forms,
+        'employee_forms': employee_forms,
     }
     return render(request, 'admin_dashboard/add_attendance.html', context)
-
 
 @group_required('hr')
 def leave_requests(request):
@@ -291,21 +288,33 @@ def handle_employee_update_request(request, request_id):
 
     if action == 'approve':
         # Apply the requested changes to the employee profile
+        email = request.POST.get('email')
+        phone_number = request.POST.get('phone_number')
+        address = request.POST.get('address')
+        emergency_contact_name = request.POST.get('emergency_contact_name')
+        emergency_contact_number = request.POST.get('emergency_contact_number')
+        emergency_contact_relationship = request.POST.get('emergency_contact_relationship')
+        experience_description = request.POST.get('experience_description')
+        bank_name = request.POST.get('bank_name')
+        bank_account_number = request.POST.get('bank_account_number')
+        ifsc_code = request.POST.get('ifsc_code')
+        bank_branch = request.POST.get('bank_branch')
+
         if update_request.profile_edit:
-            employee.email = update_request.email or employee.email
-            employee.phone_number = update_request.phone_number or employee.phone_number
-            employee.address = update_request.address or employee.address
-            employee.emergency_contact_name = update_request.emergency_contact_name or employee.emergency_contact_name
-            employee.emergency_contact_number = update_request.emergency_contact_number or employee.emergency_contact_number
-            employee.emergency_contact_relationship = update_request.emergency_contact_relationship or employee.emergency_contact_relationship
-            employee.experience_description = update_request.experience_description or employee.experience_description
+            employee.email = email or update_request.email or employee.email
+            employee.phone_number =  phone_number or update_request.phone_number or employee.phone_number
+            employee.address = address or update_request.address or employee.address
+            employee.emergency_contact_name = emergency_contact_name or update_request.emergency_contact_name or employee.emergency_contact_name
+            employee.emergency_contact_number = emergency_contact_number or update_request.emergency_contact_number or employee.emergency_contact_number
+            employee.emergency_contact_relationship = emergency_contact_relationship or update_request.emergency_contact_relationship or employee.emergency_contact_relationship
+            employee.experience_description = experience_description or update_request.experience_description or employee.experience_description
             employee.has_profile_edit = False
 
         if update_request.bank_edit:
-            employee.bank_name = update_request.bank_name or employee.bank_name
-            employee.bank_account_number = update_request.bank_account_number or employee.bank_account_number
-            employee.ifsc_code = update_request.ifsc_code or employee.ifsc_code
-            employee.bank_branch = update_request.bank_branch or employee.bank_branch
+            employee.bank_name = bank_name or update_request.bank_name or employee.bank_name
+            employee.bank_account_number = bank_account_number or update_request.bank_account_number or employee.bank_account_number
+            employee.ifsc_code = ifsc_code or update_request.ifsc_code or employee.ifsc_code
+            employee.bank_branch = bank_branch or update_request.bank_branch or employee.bank_branch
             employee.has_bank_account_edit = False
 
         try:
